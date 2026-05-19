@@ -50,10 +50,51 @@ export interface LevelProgress {
   progressPct: number;
 }
 
+/** The rank the player is climbing toward, with its unlock reward. */
+export interface NextRank {
+  code: string;
+  name: string;
+  level: number;
+  xpRequired: number;
+  xpRemaining: number;
+  rewardType: string | null;
+  rewardValue: number | null;
+}
+
+/** A single level band in the player's progression roadmap. */
+export interface LevelTier {
+  level: number;
+  rankCode: string;
+  rankName: string;
+  xpStart: number;
+  xpEnd: number;
+  rewardType: string | null;
+  rewardValue: number | null;
+  state: "completed" | "current" | "locked";
+}
+
+/** A rank tier as defined in Hamara. */
+export interface RankTier {
+  id: string;
+  code: string;
+  name: string;
+  description: string;
+}
+
+/** An audited gamification action (XP adjustments, rank ups, …). */
+export interface ActivityLog {
+  id: string;
+  action: string;
+  detail: string;
+  actor: string;
+  created_at: string;
+}
+
 export interface GamificationProfile {
   user: AuthUser;
   xpTotal: number;
   level: number;
+  maxLevel: number;
   rank: {
     code: string;
     name: string;
@@ -62,6 +103,10 @@ export interface GamificationProfile {
   coins: number;
   streak: { current: number; longest: number };
   progress: LevelProgress;
+  nextRank: NextRank | null;
+  levels: LevelTier[];
+  ranks: RankTier[];
+  logs: ActivityLog[];
 }
 
 export interface Mission {

@@ -78,7 +78,10 @@ const Profile: FC = () => {
           {/* Level progress */}
           <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 mb-6">
             <div className="flex justify-between text-sm mb-2">
-              <span>Level {p.progress.level} progress</span>
+              <span>
+                Level {p.progress.level}
+                {p.maxLevel ? ` / ${p.maxLevel}` : ""} progress
+              </span>
               <span className="text-slate-400">
                 {p.progress.xpIntoLevel} XP
                 {p.progress.nextLevelXp !== null
@@ -100,6 +103,109 @@ const Profile: FC = () => {
               </span>
             </div>
           </div>
+
+          {/* Next rank */}
+          {p.nextRank && (
+            <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 mb-6">
+              <div className="flex items-center justify-between mb-2">
+                <h2 className="font-semibold">Next rank</h2>
+                <span className="text-xs font-medium px-3 py-1 rounded-full bg-indigo-500/15 text-indigo-300 border border-indigo-500/30">
+                  {p.nextRank.name}
+                </span>
+              </div>
+              <p className="text-sm text-slate-400">
+                Reach{" "}
+                <span className="text-slate-200 font-medium">
+                  level {p.nextRank.level}
+                </span>{" "}
+                ({p.nextRank.xpRequired} XP) —{" "}
+                <span className="text-amber-400 font-medium">
+                  {p.nextRank.xpRemaining} XP to go
+                </span>
+                .
+              </p>
+              {p.nextRank.rewardType && (
+                <p className="text-xs text-slate-500 mt-1">
+                  Unlock reward: {p.nextRank.rewardValue ?? ""}{" "}
+                  {p.nextRank.rewardType.replace(/_/g, " ")}
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Level roadmap */}
+          {p.levels.length > 0 && (
+            <>
+              <h2 className="font-semibold mb-3">Level Roadmap</h2>
+              <div className="space-y-2 mb-6">
+                {p.levels.map((l) => (
+                  <div
+                    key={`${l.rankCode}-${l.level}`}
+                    className={`flex items-center justify-between p-4 rounded-xl border ${
+                      l.state === "current"
+                        ? "border-amber-400 bg-amber-500/10"
+                        : l.state === "completed"
+                          ? "border-emerald-700 bg-emerald-500/5"
+                          : "border-slate-800 bg-slate-900"
+                    }`}
+                  >
+                    <div>
+                      <div className="font-semibold">
+                        Level {l.level} · {l.rankName}{" "}
+                        {l.state === "current" && (
+                          <span className="text-amber-400">← you</span>
+                        )}
+                      </div>
+                      <div className="text-xs text-slate-400">
+                        {l.xpStart}–{l.xpEnd} XP
+                        {l.rewardType
+                          ? ` · reward: ${l.rewardValue ?? ""} ${l.rewardType.replace(
+                              /_/g,
+                              " "
+                            )}`
+                          : ""}
+                      </div>
+                    </div>
+                    <span
+                      className={`text-xs px-2 py-1 rounded-full ${
+                        l.state === "locked"
+                          ? "bg-slate-800 text-slate-500"
+                          : "bg-emerald-500/20 text-emerald-400"
+                      }`}
+                    >
+                      {l.state === "locked" ? "Locked" : "Unlocked"}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
+          {/* Recent activity (Hamara gamification logs) */}
+          {p.logs.length > 0 && (
+            <>
+              <h2 className="font-semibold mb-3">Recent Activity</h2>
+              <div className="border border-slate-800 rounded-xl divide-y divide-slate-800 mb-6">
+                {p.logs.map((l) => (
+                  <div
+                    key={l.id}
+                    className="p-4 flex items-start justify-between gap-4"
+                  >
+                    <div className="min-w-0">
+                      <div className="font-medium text-sm">{l.action}</div>
+                      <div className="text-xs text-slate-400 truncate">
+                        {l.detail}
+                      </div>
+                    </div>
+                    <div className="text-xs text-slate-500 shrink-0 text-right">
+                      <div>{new Date(l.created_at).toLocaleString()}</div>
+                      <div>by {l.actor}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
 
           {/* XP history */}
           <h2 className="font-semibold mb-3">XP History</h2>

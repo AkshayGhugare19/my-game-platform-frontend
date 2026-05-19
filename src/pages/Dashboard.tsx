@@ -160,7 +160,10 @@ const Dashboard: FC = () => {
 
           <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 mb-6">
             <div className="flex justify-between text-sm mb-2">
-              <span>Level {p.progress.level} progress</span>
+              <span>
+                Level {p.progress.level}
+                {p.maxLevel ? ` / ${p.maxLevel}` : ""} progress
+              </span>
               <span className="text-slate-400">
                 {p.progress.xpIntoLevel} XP
                 {p.progress.nextLevelXp
@@ -174,8 +177,27 @@ const Dashboard: FC = () => {
                 style={{ width: `${p.progress.progressPct}%` }}
               />
             </div>
-            <div className="text-xs text-slate-500 mt-2">
-              🔥 Streak: {p.streak.current} day(s) · Longest {p.streak.longest}
+            <div className="flex flex-wrap justify-between gap-2 text-xs text-slate-500 mt-2">
+              <span>
+                🔥 Streak: {p.streak.current} day(s) · Longest {p.streak.longest}
+              </span>
+              {p.nextRank ? (
+                <span>
+                  Next:{" "}
+                  <span className="text-indigo-300 font-medium">
+                    {p.nextRank.name}
+                  </span>{" "}
+                  · {p.nextRank.xpRemaining} XP to go
+                  {p.nextRank.rewardType
+                    ? ` · reward ${p.nextRank.rewardValue ?? ""} ${p.nextRank.rewardType.replace(
+                        /_/g,
+                        " "
+                      )}`
+                    : ""}
+                </span>
+              ) : (
+                <span className="text-emerald-400">Max rank reached 🎉</span>
+              )}
             </div>
           </div>
 

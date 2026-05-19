@@ -1,0 +1,49 @@
+import apiService from "@/services/api";
+import type {
+  ActivityResult,
+  ApiResponse,
+  GamificationProfile,
+  PaginatedData,
+  RecordActivityPayload,
+} from "@/types";
+
+/**
+ * Centralised, typed API surface — one place that knows the route shapes,
+ * so pages depend on `endpoints.profile.get()` instead of raw URL strings.
+ * Mirrors the backend's hamaraEngageService structure on the client side.
+ */
+
+export interface XpHistoryRow {
+  id: string;
+  source: string;
+  rule_code: string | null;
+  xp_amount: number;
+  balance_after: number;
+  created_at: string;
+}
+
+const endpoints = {
+  /** /api/profile — gamification profile sourced from Hamara Engage. */
+  profile: {
+    get: (): Promise<ApiResponse<GamificationProfile>> =>
+      apiService.get<GamificationProfile>("/profile"),
+    xpHistory: (
+      page = 1,
+      limit = 15
+    ): Promise<ApiResponse<PaginatedData<XpHistoryRow>>> =>
+      apiService.get<PaginatedData<XpHistoryRow>>("/profile/xp/history", {
+        page,
+        limit,
+      }),
+  },
+
+  /** /api/activity — record a gameplay / bet event (XP rewards participation). */
+  activity: {
+    record: (
+      payload: RecordActivityPayload
+    ): Promise<ApiResponse<ActivityResult>> =>
+      apiService.post<ActivityResult>("/activity", payload),
+  },
+};
+
+export default endpoints;

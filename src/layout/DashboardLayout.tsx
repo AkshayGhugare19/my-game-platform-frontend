@@ -10,6 +10,7 @@ import {
   LogOut,
   Medal,
   History,
+  Disc3,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useSocket } from "@/context/SocketContext";
@@ -21,6 +22,7 @@ const nav = [
   { to: "/rewards", label: "Rewards", icon: Gift },
   { to: "/leaderboard", label: "Leaderboard", icon: Trophy },
   { to: "/rank-progress", label: "Rank Progress", icon: Medal },
+  { to: "/lucky-spinner", label: "Lucky Spinner", icon: Disc3 },
   { to: "/game-history", label: "Game History", icon: History },
   { to: "/profile", label: "Profile", icon: User },
 ];

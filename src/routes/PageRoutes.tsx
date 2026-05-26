@@ -11,6 +11,7 @@ import Rewards from "@/pages/Rewards";
 import Leaderboard from "@/pages/Leaderboard";
 import RankProgress from "@/pages/RankProgress";
 import GameHistory from "@/pages/GameHistory";
+import LuckySpinner from "@/pages/LuckySpinner";
 import Notifications from "@/pages/Notifications";
 import NotFound from "@/pages/NotFound";
 
@@ -29,6 +30,7 @@ const PageRoutes: FC = () => (
       <Route path="/rewards" element={<Rewards />} />
       <Route path="/leaderboard" element={<Leaderboard />} />
       <Route path="/rank-progress" element={<RankProgress />} />
+      <Route path="/lucky-spinner" element={<LuckySpinner />} />
       <Route path="/game-history" element={<GameHistory />} />
       <Route path="/notifications" element={<Notifications />} />
     </Route>

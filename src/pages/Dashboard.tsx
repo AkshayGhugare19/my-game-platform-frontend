@@ -127,7 +127,16 @@ const Dashboard: FC = () => {
         gameId: randomGameId(),
         amount: winAmount,
         idempotencyKey: newKey("GAME_PLAY"),
-        meta: { game: "slider", value, bet, win, winAmount },
+        meta: {
+          game: "slider",
+          name: "Slider",
+          category: "Slots",
+          provider: "Internal",
+          value,
+          bet,
+          win,
+          winAmount,
+        },
       });
       if (response?.success)
         toast.success(

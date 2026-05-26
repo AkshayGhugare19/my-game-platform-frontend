@@ -123,13 +123,20 @@ export interface Mission {
   status: "LOCKED" | "IN_PROGRESS" | "COMPLETED" | "CLAIMED" | "EXPIRED";
 }
 
+/**
+ * Reward row as returned by gamru (`player_rewards`). Mission/level
+ * rewards auto-granted by gamru and admin-issued manual rewards both
+ * share this shape — only `gamification_source` and `is_manual` differ.
+ */
 export interface UserReward {
   id: string;
-  reward_id: string;
-  source: string;
   status: string;
-  granted_at: string;
-  expires_at: string | null;
+  granted_date?: string | null;
+  gamification_source?: string | null;
+  reward_type?: string | null;
+  reward?: string | null;
+  is_manual?: boolean;
+  created_at?: string;
 }
 
 export interface LeaderboardRow {

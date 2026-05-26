@@ -144,6 +144,10 @@ const LuckySpinner: FC = () => {
         idempotencyKey: newKey("GAME_PLAY"),
         meta: {
           game: "lucky-spinner",
+          name: "Lucky Spinner",
+          category: "MT_ORIGINALS",
+          provider: "Internal",
+          bet: picked.value,
           picked: picked.value,
           landed: landed.value,
           win,

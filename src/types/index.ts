@@ -159,7 +159,7 @@ export interface ActivityResult {
     dailyBonus: number;
   };
   xpTotal: number;
-  hamara: Record<string, unknown> | null;
+  gamru: Record<string, unknown> | null;
 }
 
 export interface RecordActivityPayload {

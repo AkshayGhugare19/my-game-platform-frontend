@@ -1,5 +1,10 @@
-import { useEffect, useState, type FC, type ReactNode } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import {
+  useEffect,
+  useState,
+  type FC,
+  type ReactNode,
+} from "react";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Trophy,
@@ -11,28 +16,71 @@ import {
   Medal,
   History,
   Disc3,
+  Gamepad2,
+  Flame,
+  Brain,
+  Zap,
+  SlidersHorizontal,
+  ChevronDown,
+  type LucideIcon,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useSocket } from "@/context/SocketContext";
 import apiService from "@/services/api";
 
-const nav = [
+type BadgeKey = "rewards";
+
+interface NavItem {
+  to: string;
+  label: string;
+  icon: LucideIcon;
+  badgeKey?: BadgeKey;
+}
+
+interface NavGroup {
+  key: string;
+  label: string;
+  icon: LucideIcon;
+  basePath: string;
+  children: NavItem[];
+}
+
+const nav: Array<NavItem | NavGroup> = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/missions", label: "Missions", icon: Target },
-  { to: "/rewards", label: "Rewards", icon: Gift, badgeKey: "rewards" as const },
+  { to: "/rewards", label: "Rewards", icon: Gift, badgeKey: "rewards" },
   { to: "/leaderboard", label: "Leaderboard", icon: Trophy },
   { to: "/rank-progress", label: "Rank Progress", icon: Medal },
-  { to: "/lucky-spinner", label: "Lucky Spinner", icon: Disc3 },
+  {
+    key: "games",
+    label: "Games",
+    icon: Gamepad2,
+    basePath: "/games",
+    children: [
+      { to: "/games/slider", label: "Slider", icon: SlidersHorizontal },
+      { to: "/games/lucky-spinner", label: "Lucky Spinner", icon: Disc3 },
+      { to: "/games/dragon-run", label: "Dragon Run", icon: Flame },
+      { to: "/games/memory-match", label: "Memory Match", icon: Brain },
+      { to: "/games/click-storm", label: "Click Storm", icon: Zap },
+    ],
+  },
   { to: "/game-history", label: "Game History", icon: History },
   { to: "/profile", label: "Profile", icon: User },
 ];
+
+const isGroup = (item: NavItem | NavGroup): item is NavGroup =>
+  (item as NavGroup).children !== undefined;
 
 const DashboardLayout: FC<{ children: ReactNode }> = ({ children }) => {
   const { user, logout } = useAuth();
   const { on } = useSocket();
   const navigate = useNavigate();
+  const location = useLocation();
   const [unread, setUnread] = useState(0);
   const [pendingRewards, setPendingRewards] = useState(0);
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(() => ({
+    games: location.pathname.startsWith("/games"),
+  }));
 
   const loadUnread = async () => {
     try {
@@ -72,40 +120,94 @@ const DashboardLayout: FC<{ children: ReactNode }> = ({ children }) => {
     };
   }, [on]);
 
+  // Auto-open a group whenever the route enters it (e.g. external link to
+  // /games/dragon-run should leave the Games group expanded on arrival).
+  useEffect(() => {
+    setOpenGroups((curr) => {
+      const next = { ...curr };
+      for (const item of nav) {
+        if (isGroup(item) && location.pathname.startsWith(item.basePath)) {
+          next[item.key] = true;
+        }
+      }
+      return next;
+    });
+  }, [location.pathname]);
+
+  const badgeFor = (key?: BadgeKey): number | null =>
+    key === "rewards" && pendingRewards > 0 ? pendingRewards : null;
+
+  const renderLeaf = (item: NavItem, indent = false) => {
+    const badge = badgeFor(item.badgeKey);
+    const Icon = item.icon;
+    return (
+      <NavLink
+        key={item.to}
+        to={item.to}
+        className={({ isActive }) =>
+          `flex items-center gap-3 px-3 py-2 rounded-md text-sm ${
+            indent ? "ml-7 pl-3" : ""
+          } ${
+            isActive
+              ? "bg-indigo-600 text-white"
+              : "text-slate-300 hover:bg-slate-800"
+          }`
+        }
+      >
+        <Icon size={indent ? 16 : 18} />
+        <span className="flex-1">{item.label}</span>
+        {badge !== null && (
+          <span className="bg-red-500 text-white text-[10px] font-semibold rounded-full min-w-[20px] h-5 px-1.5 flex items-center justify-center">
+            {badge}
+          </span>
+        )}
+      </NavLink>
+    );
+  };
+
+  const renderGroup = (group: NavGroup) => {
+    const open = openGroups[group.key] ?? false;
+    const active = location.pathname.startsWith(group.basePath);
+    const Icon = group.icon;
+    return (
+      <div key={group.key}>
+        <button
+          type="button"
+          onClick={() =>
+            setOpenGroups((curr) => ({ ...curr, [group.key]: !open }))
+          }
+          className={`w-full flex items-center gap-3 px-3 py-2 rounded-md text-sm ${
+            active
+              ? "bg-slate-800 text-white"
+              : "text-slate-300 hover:bg-slate-800"
+          }`}
+        >
+          <Icon size={18} />
+          <span className="flex-1 text-left">{group.label}</span>
+          <ChevronDown
+            size={16}
+            className={`transition-transform ${open ? "rotate-180" : ""}`}
+          />
+        </button>
+        {open && (
+          <div className="mt-1 space-y-1">
+            {group.children.map((c) => renderLeaf(c, true))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen flex bg-slate-950 text-white">
       <aside className="w-60 bg-slate-900 border-r border-slate-800 flex flex-col">
         <div className="p-5 text-xl font-bold tracking-tight">
           🎮 Gamify<span className="text-indigo-400">Engage</span>
         </div>
-        <nav className="flex-1 px-3 space-y-1">
-          {nav.map(({ to, label, icon: Icon, badgeKey }) => {
-            const badge =
-              badgeKey === "rewards" && pendingRewards > 0
-                ? pendingRewards
-                : null;
-            return (
-              <NavLink
-                key={to}
-                to={to}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 px-3 py-2 rounded-md text-sm ${
-                    isActive
-                      ? "bg-indigo-600 text-white"
-                      : "text-slate-300 hover:bg-slate-800"
-                  }`
-                }
-              >
-                <Icon size={18} />
-                <span className="flex-1">{label}</span>
-                {badge !== null && (
-                  <span className="bg-red-500 text-white text-[10px] font-semibold rounded-full min-w-[20px] h-5 px-1.5 flex items-center justify-center">
-                    {badge}
-                  </span>
-                )}
-              </NavLink>
-            );
-          })}
+        <nav className="flex-1 px-3 space-y-1 overflow-y-auto">
+          {nav.map((item) =>
+            isGroup(item) ? renderGroup(item) : renderLeaf(item)
+          )}
         </nav>
         <button
           onClick={() => {

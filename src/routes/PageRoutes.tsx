@@ -11,7 +11,12 @@ import Rewards from "@/pages/Rewards";
 import Leaderboard from "@/pages/Leaderboard";
 import RankProgress from "@/pages/RankProgress";
 import GameHistory from "@/pages/GameHistory";
+import Games from "@/pages/Games";
 import LuckySpinner from "@/pages/LuckySpinner";
+import Slider from "@/pages/games/Slider";
+import DragonRun from "@/pages/games/DragonRun";
+import MemoryMatch from "@/pages/games/MemoryMatch";
+import ClickStorm from "@/pages/games/ClickStorm";
 import Notifications from "@/pages/Notifications";
 import NotFound from "@/pages/NotFound";
 
@@ -30,7 +35,17 @@ const PageRoutes: FC = () => (
       <Route path="/rewards" element={<Rewards />} />
       <Route path="/leaderboard" element={<Leaderboard />} />
       <Route path="/rank-progress" element={<RankProgress />} />
-      <Route path="/lucky-spinner" element={<LuckySpinner />} />
+      <Route path="/games" element={<Games />} />
+      <Route path="/games/slider" element={<Slider />} />
+      <Route path="/games/lucky-spinner" element={<LuckySpinner />} />
+      <Route path="/games/dragon-run" element={<DragonRun />} />
+      <Route path="/games/memory-match" element={<MemoryMatch />} />
+      <Route path="/games/click-storm" element={<ClickStorm />} />
+      {/* Back-compat with the old direct route used by older bookmarks. */}
+      <Route
+        path="/lucky-spinner"
+        element={<Navigate to="/games/lucky-spinner" replace />}
+      />
       <Route path="/game-history" element={<GameHistory />} />
       <Route path="/notifications" element={<Notifications />} />
     </Route>

@@ -1,0 +1,75 @@
+import type { FC } from "react";
+import { NavLink } from "react-router-dom";
+import { Disc3, Flame, Brain, Zap, SlidersHorizontal } from "lucide-react";
+import DashboardLayout from "@/layout/DashboardLayout";
+
+const GAMES = [
+  {
+    to: "/games/slider",
+    title: "Slider Game",
+    blurb: "Stop the marker past your bet line to win.",
+    icon: SlidersHorizontal,
+    accent: "from-sky-500 to-blue-500",
+  },
+  {
+    to: "/games/lucky-spinner",
+    title: "Lucky Spinner",
+    blurb: "Pick a number, spin the wheel, win big.",
+    icon: Disc3,
+    accent: "from-indigo-500 to-purple-500",
+  },
+  {
+    to: "/games/dragon-run",
+    title: "Dragon Run",
+    blurb: "Jump over walls. Grab gems. One hit ends it.",
+    icon: Flame,
+    accent: "from-rose-500 to-orange-500",
+  },
+  {
+    to: "/games/memory-match",
+    title: "Memory Match",
+    blurb: "Flip cards, pair them up. Fewer moves = more XP.",
+    icon: Brain,
+    accent: "from-emerald-500 to-cyan-500",
+  },
+  {
+    to: "/games/click-storm",
+    title: "Click Storm",
+    blurb: "15 seconds. Hit every target. Beat your record.",
+    icon: Zap,
+    accent: "from-amber-500 to-yellow-500",
+  },
+];
+
+const Games: FC = () => (
+  <DashboardLayout>
+    <h1 className="text-2xl font-bold mb-2">🎮 Games</h1>
+    <p className="text-slate-400 text-sm mb-6">
+      Quick-play mini games. Every round earns XP and feeds the rewards engine.
+    </p>
+    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+      {GAMES.map(({ to, title, blurb, icon: Icon, accent }) => (
+        <NavLink
+          key={to}
+          to={to}
+          className="group bg-slate-900 border border-slate-800 hover:border-slate-600 rounded-2xl p-5 transition-all"
+        >
+          <div
+            className={`bg-gradient-to-br ${accent} w-12 h-12 rounded-xl flex items-center justify-center mb-4 shadow-lg`}
+          >
+            <Icon size={24} className="text-white" />
+          </div>
+          <div className="font-semibold text-lg mb-1 group-hover:text-indigo-300">
+            {title}
+          </div>
+          <p className="text-sm text-slate-400">{blurb}</p>
+          <div className="mt-4 text-xs text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity">
+            Play →
+          </div>
+        </NavLink>
+      ))}
+    </div>
+  </DashboardLayout>
+);
+
+export default Games;

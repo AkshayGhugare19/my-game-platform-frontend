@@ -19,7 +19,7 @@ import apiService from "@/services/api";
 const nav = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/missions", label: "Missions", icon: Target },
-  { to: "/rewards", label: "Rewards", icon: Gift },
+  { to: "/rewards", label: "Rewards", icon: Gift, badgeKey: "rewards" as const },
   { to: "/leaderboard", label: "Leaderboard", icon: Trophy },
   { to: "/rank-progress", label: "Rank Progress", icon: Medal },
   { to: "/lucky-spinner", label: "Lucky Spinner", icon: Disc3 },
@@ -32,6 +32,7 @@ const DashboardLayout: FC<{ children: ReactNode }> = ({ children }) => {
   const { on } = useSocket();
   const navigate = useNavigate();
   const [unread, setUnread] = useState(0);
+  const [pendingRewards, setPendingRewards] = useState(0);
 
   const loadUnread = async () => {
     try {
@@ -44,10 +45,31 @@ const DashboardLayout: FC<{ children: ReactNode }> = ({ children }) => {
     }
   };
 
+  const loadPendingRewards = async () => {
+    try {
+      const r = await apiService.get<{ count: number }>(
+        "/rewards/pending-count"
+      );
+      if (r?.success) setPendingRewards(r.data?.count ?? 0);
+    } catch {
+      /* ignore */
+    }
+  };
+
   useEffect(() => {
     loadUnread();
-    const off = on("notification:new", () => setUnread((n) => n + 1));
-    return off;
+    loadPendingRewards();
+    const offNotif = on("notification:new", () => {
+      setUnread((n) => n + 1);
+      loadPendingRewards();
+    });
+    const offReward = on("reward:granted", () => {
+      loadPendingRewards();
+    });
+    return () => {
+      offNotif();
+      offReward();
+    };
   }, [on]);
 
   return (
@@ -57,21 +79,33 @@ const DashboardLayout: FC<{ children: ReactNode }> = ({ children }) => {
           🎮 Gamify<span className="text-indigo-400">Engage</span>
         </div>
         <nav className="flex-1 px-3 space-y-1">
-          {nav.map(({ to, label, icon: Icon }) => (
-            <NavLink
-              key={to}
-              to={to}
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2 rounded-md text-sm ${
-                  isActive
-                    ? "bg-indigo-600 text-white"
-                    : "text-slate-300 hover:bg-slate-800"
-                }`
-              }
-            >
-              <Icon size={18} /> {label}
-            </NavLink>
-          ))}
+          {nav.map(({ to, label, icon: Icon, badgeKey }) => {
+            const badge =
+              badgeKey === "rewards" && pendingRewards > 0
+                ? pendingRewards
+                : null;
+            return (
+              <NavLink
+                key={to}
+                to={to}
+                className={({ isActive }) =>
+                  `flex items-center gap-3 px-3 py-2 rounded-md text-sm ${
+                    isActive
+                      ? "bg-indigo-600 text-white"
+                      : "text-slate-300 hover:bg-slate-800"
+                  }`
+                }
+              >
+                <Icon size={18} />
+                <span className="flex-1">{label}</span>
+                {badge !== null && (
+                  <span className="bg-red-500 text-white text-[10px] font-semibold rounded-full min-w-[20px] h-5 px-1.5 flex items-center justify-center">
+                    {badge}
+                  </span>
+                )}
+              </NavLink>
+            );
+          })}
         </nav>
         <button
           onClick={() => {

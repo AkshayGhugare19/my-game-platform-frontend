@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState, type FC } from "react";
+import { toast } from "react-toastify";
 import DashboardLayout from "@/layout/DashboardLayout";
 import apiService from "@/services/api";
 import type { UserReward } from "@/types";
@@ -8,6 +9,7 @@ const titleCase = (s: string) =>
 
 const Rewards: FC = () => {
   const [rewards, setRewards] = useState<UserReward[]>([]);
+  const [claiming, setClaiming] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     const r = await apiService.get<UserReward[]>("/rewards");
@@ -17,6 +19,24 @@ const Rewards: FC = () => {
   useEffect(() => {
     load();
   }, [load]);
+
+  const handleClaim = async (id: string) => {
+    if (claiming) return;
+    setClaiming(id);
+    try {
+      const r = await apiService.post(`/rewards/${id}/claim`);
+      if (r?.success) {
+        toast.success(r.message || "Reward claimed");
+        await load();
+      } else {
+        toast.error(r?.message || "Failed to claim reward");
+      }
+    } catch (e) {
+      toast.error((e as { message?: string })?.message || "Failed to claim reward");
+    } finally {
+      setClaiming(null);
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -30,29 +50,47 @@ const Rewards: FC = () => {
               <th className="p-3 text-left">Source</th>
               <th className="p-3 text-left">Reward Type</th>
               <th className="p-3 text-left">Reward</th>
+              <th className="p-3 text-right">Action</th>
             </tr>
           </thead>
           <tbody>
-            {rewards.map((r) => (
-              <tr key={r.id} className="border-t border-slate-800">
-                <td className="p-3">{titleCase(String(r.status ?? ""))}</td>
-                <td className="p-3 text-slate-400">
-                  {r.granted_date
-                    ? new Date(r.granted_date).toLocaleString()
-                    : "—"}
-                </td>
-                <td className="p-3">
-                  {r.is_manual
-                    ? "Manual"
-                    : titleCase(String(r.gamification_source ?? "—"))}
-                </td>
-                <td className="p-3">{r.reward_type ?? "—"}</td>
-                <td className="p-3">{r.reward ?? "—"}</td>
-              </tr>
-            ))}
+            {rewards.map((r) => {
+              const status = String(r.status ?? "").toUpperCase();
+              const isPending = status === "IN_PROGRESS";
+              return (
+                <tr key={r.id} className="border-t border-slate-800">
+                  <td className="p-3">{titleCase(String(r.status ?? ""))}</td>
+                  <td className="p-3 text-slate-400">
+                    {r.granted_date
+                      ? new Date(r.granted_date).toLocaleString()
+                      : "—"}
+                  </td>
+                  <td className="p-3">
+                    {r.is_manual
+                      ? "Manual"
+                      : titleCase(String(r.gamification_source ?? "—"))}
+                  </td>
+                  <td className="p-3">{r.reward_type ?? "—"}</td>
+                  <td className="p-3">{r.reward ?? "—"}</td>
+                  <td className="p-3 text-right">
+                    {isPending ? (
+                      <button
+                        onClick={() => handleClaim(r.id)}
+                        disabled={claiming === r.id}
+                        className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-60 text-white text-xs px-3 py-1.5 rounded-md"
+                      >
+                        {claiming === r.id ? "Claiming…" : "Claim"}
+                      </button>
+                    ) : (
+                      <span className="text-slate-500 text-xs">—</span>
+                    )}
+                  </td>
+                </tr>
+              );
+            })}
             {rewards.length === 0 && (
               <tr>
-                <td colSpan={5} className="p-6 text-center text-slate-500">
+                <td colSpan={6} className="p-6 text-center text-slate-500">
                   No rewards yet — climb ranks and complete missions.
                 </td>
               </tr>

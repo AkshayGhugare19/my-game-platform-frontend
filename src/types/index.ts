@@ -169,6 +169,14 @@ export interface ActivityResult {
   gamru: Record<string, unknown> | null;
 }
 
+/** The player's money wallet, as returned by /api/wallet. */
+export interface Wallet {
+  balance: number;
+  currency: string;
+  depositCount: number;
+  totalDeposit: number;
+}
+
 export interface RecordActivityPayload {
   type: "GAME_PLAY" | "BET_PLACE";
   gameId: string;

@@ -21,6 +21,7 @@ import {
   Brain,
   Zap,
   SlidersHorizontal,
+  Wallet,
   ChevronDown,
   type LucideIcon,
 } from "lucide-react";
@@ -49,6 +50,7 @@ const nav: Array<NavItem | NavGroup> = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/missions", label: "Missions", icon: Target },
   { to: "/rewards", label: "Rewards", icon: Gift, badgeKey: "rewards" },
+  { to: "/deposit", label: "Deposit", icon: Wallet },
   { to: "/leaderboard", label: "Leaderboard", icon: Trophy },
   { to: "/rank-progress", label: "Rank Progress", icon: Medal },
   {

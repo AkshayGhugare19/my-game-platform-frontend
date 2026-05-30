@@ -5,6 +5,7 @@ import type {
   GamificationProfile,
   PaginatedData,
   RecordActivityPayload,
+  Wallet,
 } from "@/types";
 
 /**
@@ -35,6 +36,14 @@ const endpoints = {
         page,
         limit,
       }),
+  },
+
+  /** /api/wallet — player money wallet (deposit funds, view balance). */
+  wallet: {
+    get: (): Promise<ApiResponse<Wallet>> =>
+      apiService.get<Wallet>("/wallet"),
+    deposit: (amount: number): Promise<ApiResponse<Wallet>> =>
+      apiService.post<Wallet>("/wallet/deposit", { amount }),
   },
 
   /** /api/activity — record a gameplay / bet event (XP rewards participation). */

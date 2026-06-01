@@ -24,6 +24,10 @@ import {
   Wallet,
   ChevronDown,
   type LucideIcon,
+  LineSquiggle,
+  TrophyIcon,
+  PuzzleIcon,
+  AirplayIcon,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useSocket } from "@/context/SocketContext";
@@ -64,6 +68,9 @@ const nav: Array<NavItem | NavGroup> = [
       { to: "/games/dragon-run", label: "Dragon Run", icon: Flame },
       { to: "/games/memory-match", label: "Memory Match", icon: Brain },
       { to: "/games/click-storm", label: "Click Storm", icon: Zap },
+      { to: "/games/snake", label: "Snake", icon: LineSquiggle },
+      { to: "/games/teen-patti", label: "Teen Patti", icon: TrophyIcon },
+      { to: "/games/aviator", label: "Aviator", icon: AirplayIcon },
     ],
   },
   { to: "/game-history", label: "Game History", icon: History },

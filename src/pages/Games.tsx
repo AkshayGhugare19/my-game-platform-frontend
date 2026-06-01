@@ -1,6 +1,15 @@
 import type { FC } from "react";
 import { NavLink } from "react-router-dom";
-import { Disc3, Flame, Brain, Zap, SlidersHorizontal } from "lucide-react";
+import {
+  Disc3,
+  Flame,
+  Brain,
+  Zap,
+  SlidersHorizontal,
+  Worm,
+  Spade,
+  Plane,
+} from "lucide-react";
 import DashboardLayout from "@/layout/DashboardLayout";
 
 const GAMES = [
@@ -38,6 +47,27 @@ const GAMES = [
     blurb: "15 seconds. Hit every target. Beat your record.",
     icon: Zap,
     accent: "from-amber-500 to-yellow-500",
+  },
+  {
+    to: "/games/snake",
+    title: "Snake",
+    blurb: "Eat apples, grow longer. Don't bite your tail.",
+    icon: Worm,
+    accent: "from-green-500 to-emerald-500",
+  },
+  {
+    to: "/games/teen-patti",
+    title: "Teen Patti",
+    blurb: "Three cards each. Beat the dealer's hand to win.",
+    icon: Spade,
+    accent: "from-fuchsia-500 to-purple-600",
+  },
+  {
+    to: "/games/aviator",
+    title: "Aviator",
+    blurb: "Cash out before the plane flies away. Greed crashes.",
+    icon: Plane,
+    accent: "from-red-500 to-rose-600",
   },
 ];
 

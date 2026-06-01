@@ -18,6 +18,9 @@ import Slider from "@/pages/games/Slider";
 import DragonRun from "@/pages/games/DragonRun";
 import MemoryMatch from "@/pages/games/MemoryMatch";
 import ClickStorm from "@/pages/games/ClickStorm";
+import Snake from "@/pages/games/Snake";
+import TeenPatti from "@/pages/games/TeenPatti";
+import Aviator from "@/pages/games/Aviator";
 import Notifications from "@/pages/Notifications";
 import NotFound from "@/pages/NotFound";
 
@@ -43,6 +46,9 @@ const PageRoutes: FC = () => (
       <Route path="/games/dragon-run" element={<DragonRun />} />
       <Route path="/games/memory-match" element={<MemoryMatch />} />
       <Route path="/games/click-storm" element={<ClickStorm />} />
+      <Route path="/games/snake" element={<Snake />} />
+      <Route path="/games/teen-patti" element={<TeenPatti />} />
+      <Route path="/games/aviator" element={<Aviator />} />
       {/* Back-compat with the old direct route used by older bookmarks. */}
       <Route
         path="/lucky-spinner"

@@ -104,7 +104,7 @@ const Aviator: FC = () => {
             game: "aviator",
             name: "Aviator",
             category: "Crash",
-            provider: "Internal",
+            provider: "SDLC",
             bet,
             cashedAt,
             crashAt,

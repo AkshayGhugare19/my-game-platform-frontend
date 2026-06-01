@@ -26,7 +26,6 @@ import {
   type LucideIcon,
   LineSquiggle,
   TrophyIcon,
-  PuzzleIcon,
   AirplayIcon,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";

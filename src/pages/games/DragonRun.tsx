@@ -116,7 +116,7 @@ const DragonRun: FC = () => {
             game: "dragon-run",
             name: "Dragon Run",
             category: "MT_ORIGINALS",
-            provider: "Internal",
+            provider: "Pragmatics",
             score: finalScore,
             gems: finalGems,
             win: finalScore > 0,

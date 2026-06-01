@@ -154,7 +154,7 @@ const MemoryMatch: FC = () => {
             game: "memory-match",
             name: "Memory Match",
             category: "MT_ORIGINALS",
-            provider: "Internal",
+            provider: "Pragmatics",
             moves,
             seconds,
             win: true,

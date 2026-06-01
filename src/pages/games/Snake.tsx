@@ -156,7 +156,7 @@ const Snake: FC = () => {
             game: "snake",
             name: "Snake",
             category: "MT_ORIGINALS",
-            provider: "Internal",
+            provider: "External",
             score: finalScore,
             apples,
             win: finalScore > 0,

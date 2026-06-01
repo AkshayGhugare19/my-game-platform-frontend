@@ -84,7 +84,7 @@ const ClickStorm: FC = () => {
             game: "click-storm",
             name: "Click Storm",
             category: "MT_ORIGINALS",
-            provider: "Internal",
+            provider: "SDLC",
             hits: finalHits,
             misses: finalMisses,
             accuracy:

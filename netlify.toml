@@ -1,0 +1,15 @@
+# Netlify config for the Gamify Engage frontend (Vite + React Router SPA).
+# This file lives in my-game-platform-frontend/. In Netlify, set the site's
+# "Base directory" to my-game-platform-frontend so these paths resolve.
+
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# SPA fallback: every path that isn't a real file is served index.html (200,
+# not a redirect) so React Router can resolve the route on the client. Without
+# this, refreshing /profile, /leaderboard, etc. returns Netlify's 404 page.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

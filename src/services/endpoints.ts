@@ -2,9 +2,13 @@ import apiService from "@/services/api";
 import type {
   ActivityResult,
   ApiResponse,
+  BoosterRow,
+  BuyResult,
   GamificationProfile,
   PaginatedData,
   RecordActivityPayload,
+  RewardPurchaseRow,
+  RewardShopCatalog,
   Wallet,
 } from "@/types";
 
@@ -52,6 +56,24 @@ const endpoints = {
       payload: RecordActivityPayload
     ): Promise<ApiResponse<ActivityResult>> =>
       apiService.post<ActivityResult>("/activity", payload),
+  },
+
+  /**
+   * /api/reward-shop — browse reward products sourced from gamru, spend
+   * tokens to buy them, and view the player's boosters + purchase history.
+   */
+  rewardShop: {
+    products: (): Promise<ApiResponse<RewardShopCatalog>> =>
+      apiService.get<RewardShopCatalog>("/reward-shop/products"),
+    buy: (
+      productId: string,
+      quantity = 1
+    ): Promise<ApiResponse<BuyResult>> =>
+      apiService.post<BuyResult>("/reward-shop/buy", { productId, quantity }),
+    boosters: (): Promise<ApiResponse<BoosterRow[]>> =>
+      apiService.get<BoosterRow[]>("/reward-shop/boosters"),
+    history: (): Promise<ApiResponse<RewardPurchaseRow[]>> =>
+      apiService.get<RewardPurchaseRow[]>("/reward-shop/history"),
   },
 };
 

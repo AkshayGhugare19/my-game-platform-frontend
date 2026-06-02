@@ -184,3 +184,76 @@ export interface RecordActivityPayload {
   idempotencyKey: string;
   meta?: Record<string, unknown>;
 }
+
+/* ── Reward shop ───────────────────────────────────────────────────────── */
+
+export type ProductCategory = "product" | "booster";
+export type BoosterKind = "token" | "xp" | "level" | "mission" | "generic";
+
+export interface BoosterMeta {
+  multiplier: number;
+  durationMinutes: number;
+  kind: BoosterKind;
+}
+
+/** A reward-shop product as served by /api/reward-shop/products. */
+export interface RewardProduct {
+  id: string;
+  name: string;
+  description: string | null;
+  image: string | null;
+  tokenPrice: number;
+  realPrice: number | null;
+  currency: string;
+  category: ProductCategory;
+  categoryLabel: string;
+  tier: string | null;
+  tags: string[];
+  stockAvailable: number | null;
+  type: string | null;
+  booster: BoosterMeta | null;
+  affordable: boolean;
+}
+
+export interface RewardShopCatalog {
+  tokens: number;
+  products: RewardProduct[];
+}
+
+export interface BuyResult {
+  tokensRemaining: number;
+  tokensSpent: number;
+  boosterActivated: boolean;
+  purchase: RewardPurchaseRow | null;
+}
+
+export interface RewardPurchaseRow {
+  id: string;
+  productId: string;
+  productName: string;
+  image: string | null;
+  category: ProductCategory;
+  tier: string | null;
+  tokenCost: number;
+  quantity: number;
+  multiplier: number | null;
+  boosterKind: string | null;
+  durationMinutes: number | null;
+  expiresAt: string | null;
+  status: string;
+  createdAt: string;
+}
+
+export interface BoosterRow {
+  id: string;
+  productId: string;
+  name: string;
+  image: string | null;
+  kind: BoosterKind;
+  multiplier: number;
+  tokenCost: number;
+  tier: string | null;
+  expiresAt: string | null;
+  secondsRemaining: number | null;
+  createdAt: string;
+}

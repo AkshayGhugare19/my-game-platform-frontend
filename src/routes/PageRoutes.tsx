@@ -8,6 +8,7 @@ import Dashboard from "@/pages/Dashboard";
 import Profile from "@/pages/Profile";
 import Missions from "@/pages/Missions";
 import Rewards from "@/pages/Rewards";
+import RewardShop from "@/pages/RewardShop";
 import Deposit from "@/pages/Deposit";
 import Leaderboard from "@/pages/Leaderboard";
 import RankProgress from "@/pages/RankProgress";
@@ -37,6 +38,7 @@ const PageRoutes: FC = () => (
       <Route path="/profile" element={<Profile />} />
       <Route path="/missions" element={<Missions />} />
       <Route path="/rewards" element={<Rewards />} />
+      <Route path="/reward-shop" element={<RewardShop />} />
       <Route path="/deposit" element={<Deposit />} />
       <Route path="/leaderboard" element={<Leaderboard />} />
       <Route path="/rank-progress" element={<RankProgress />} />

@@ -1,6 +1,7 @@
 import { useEffect, useState, type FC } from "react";
 import DashboardLayout from "@/layout/DashboardLayout";
-import apiService from "@/services/api";
+import endpoints from "@/services/endpoints";
+import Pagination from "@/components/Pagination";
 import { useSocket } from "@/context/SocketContext";
 import type { LeaderboardRow } from "@/types";
 
@@ -10,24 +11,30 @@ const Leaderboard: FC = () => {
   const [board, setBoard] = useState<Board>("global");
   const [rows, setRows] = useState<LeaderboardRow[]>([]);
   const [me, setMe] = useState<LeaderboardRow | null>(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
   const { on } = useSocket();
 
-  const load = async (b: Board) => {
-    const r = await apiService.get<{
-      rows: LeaderboardRow[];
-      me: LeaderboardRow | null;
-    }>(`/leaderboard/${b}`, { limit: 20 });
-    if (r?.success && r.data) {
-      setRows(r.data.rows);
-      setMe(r.data.me);
-    }
+  const switchBoard = (b: Board) => {
+    setBoard(b);
+    setPage(1);
   };
 
   useEffect(() => {
-    load(board);
-    const off = on("leaderboard:update", () => load(board));
+    const load = async () => {
+      const r = await endpoints.leaderboard.board(board, page);
+      if (r?.success && r.data) {
+        setRows(r.data.rows);
+        setMe(r.data.me);
+        setTotalPages(r.data.pagination.totalPages);
+        setTotal(r.data.pagination.total);
+      }
+    };
+    load();
+    const off = on("leaderboard:update", () => load());
     return off;
-  }, [board, on]);
+  }, [board, page, on]);
 
   return (
     <DashboardLayout>
@@ -36,7 +43,7 @@ const Leaderboard: FC = () => {
         {(["global", "weekly", "monthly"] as Board[]).map((b) => (
           <button
             key={b}
-            onClick={() => setBoard(b)}
+            onClick={() => switchBoard(b)}
             className={`px-4 py-2 rounded text-sm capitalize ${
               board === b
                 ? "bg-indigo-600"
@@ -81,6 +88,12 @@ const Leaderboard: FC = () => {
           </tbody>
         </table>
       </div>
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        total={total}
+        onChange={setPage}
+      />
     </DashboardLayout>
   );
 };

@@ -5,12 +5,18 @@ import type {
   BoosterRow,
   BuyResult,
   GamificationProfile,
+  LeaderboardData,
+  Mission,
+  NotificationItem,
   PaginatedData,
   RecordActivityPayload,
   RewardPurchaseRow,
   RewardShopCatalog,
+  UserReward,
   Wallet,
 } from "@/types";
+
+type Board = "global" | "weekly" | "monthly";
 
 /**
  * Centralised, typed API surface — one place that knows the route shapes,
@@ -63,17 +69,80 @@ const endpoints = {
    * tokens to buy them, and view the player's boosters + purchase history.
    */
   rewardShop: {
-    products: (): Promise<ApiResponse<RewardShopCatalog>> =>
-      apiService.get<RewardShopCatalog>("/reward-shop/products"),
+    products: (page = 1, limit = 12): Promise<ApiResponse<RewardShopCatalog>> =>
+      apiService.get<RewardShopCatalog>("/reward-shop/products", { page, limit }),
     buy: (
       productId: string,
       quantity = 1
     ): Promise<ApiResponse<BuyResult>> =>
       apiService.post<BuyResult>("/reward-shop/buy", { productId, quantity }),
-    boosters: (): Promise<ApiResponse<BoosterRow[]>> =>
-      apiService.get<BoosterRow[]>("/reward-shop/boosters"),
-    history: (): Promise<ApiResponse<RewardPurchaseRow[]>> =>
-      apiService.get<RewardPurchaseRow[]>("/reward-shop/history"),
+    boosters: (
+      page = 1,
+      limit = 12
+    ): Promise<ApiResponse<PaginatedData<BoosterRow>>> =>
+      apiService.get<PaginatedData<BoosterRow>>("/reward-shop/boosters", {
+        page,
+        limit,
+      }),
+    history: (
+      page = 1,
+      limit = 10
+    ): Promise<ApiResponse<PaginatedData<RewardPurchaseRow>>> =>
+      apiService.get<PaginatedData<RewardPurchaseRow>>("/reward-shop/history", {
+        page,
+        limit,
+      }),
+  },
+
+  /** /api/rewards — the player's earned rewards (gamru-sourced). */
+  rewards: {
+    list: (
+      page = 1,
+      limit = 10,
+      status?: string
+    ): Promise<ApiResponse<PaginatedData<UserReward>>> =>
+      apiService.get<PaginatedData<UserReward>>("/rewards", {
+        page,
+        limit,
+        status,
+      }),
+    claim: (id: string): Promise<ApiResponse<unknown>> =>
+      apiService.post(`/rewards/${id}/claim`),
+  },
+
+  /** /api/missions — the player's missions with progress. */
+  missions: {
+    list: (
+      page = 1,
+      limit = 10
+    ): Promise<ApiResponse<PaginatedData<Mission>>> =>
+      apiService.get<PaginatedData<Mission>>("/missions", { page, limit }),
+    claim: (id: string): Promise<ApiResponse<unknown>> =>
+      apiService.post(`/missions/${id}/claim`),
+  },
+
+  /** /api/leaderboard — global / weekly / monthly boards. */
+  leaderboard: {
+    board: (
+      board: Board,
+      page = 1,
+      limit = 20
+    ): Promise<ApiResponse<LeaderboardData>> =>
+      apiService.get<LeaderboardData>(`/leaderboard/${board}`, { page, limit }),
+  },
+
+  /** /api/notifications — the player's notification feed. */
+  notifications: {
+    list: (
+      page = 1,
+      limit = 20
+    ): Promise<ApiResponse<PaginatedData<NotificationItem>>> =>
+      apiService.get<PaginatedData<NotificationItem>>("/notifications", {
+        page,
+        limit,
+      }),
+    markAllRead: (): Promise<ApiResponse<unknown>> =>
+      apiService.patch("/notifications/read-all"),
   },
 };
 

@@ -1,6 +1,7 @@
 import { useEffect, useState, type FC } from "react";
 import DashboardLayout from "@/layout/DashboardLayout";
 import apiService from "@/services/api";
+import Pagination from "@/components/Pagination";
 import type { PaginatedData } from "@/types";
 
 interface ActivityRow {
@@ -14,6 +15,7 @@ const GameHistory: FC = () => {
   const [rows, setRows] = useState<ActivityRow[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
     (async () => {
@@ -24,13 +26,14 @@ const GameHistory: FC = () => {
       if (r?.success && r.data) {
         setRows(r.data.data);
         setTotalPages(r.data.pagination.totalPages);
+        setTotal(r.data.pagination.total);
       }
     })();
   }, [page]);
 
   return (
     <DashboardLayout>
-      <h1 className="text-2xl font-bold mb-6">Game History</h1>
+      <h1 className="text-2xl font-bold">Game History</h1>
       <div className="border border-slate-800 rounded-xl overflow-hidden">
         <table className="w-full text-sm">
           <thead className="bg-slate-900">
@@ -60,25 +63,12 @@ const GameHistory: FC = () => {
           </tbody>
         </table>
       </div>
-      <div className="flex gap-2 mt-4 items-center text-sm">
-        <button
-          disabled={page <= 1}
-          onClick={() => setPage((p) => p - 1)}
-          className="px-3 py-1 bg-slate-800 rounded disabled:opacity-50"
-        >
-          Prev
-        </button>
-        <span className="text-slate-400">
-          {page} / {totalPages}
-        </span>
-        <button
-          disabled={page >= totalPages}
-          onClick={() => setPage((p) => p + 1)}
-          className="px-3 py-1 bg-slate-800 rounded disabled:opacity-50"
-        >
-          Next
-        </button>
-      </div>
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        total={total}
+        onChange={setPage}
+      />
     </DashboardLayout>
   );
 };

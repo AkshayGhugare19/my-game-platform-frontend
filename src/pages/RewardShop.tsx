@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import DashboardLayout from "@/layout/DashboardLayout";
 import endpoints from "@/services/endpoints";
+import Pagination from "@/components/Pagination";
 import type {
   BoosterRow,
   RewardProduct,
@@ -343,38 +344,50 @@ const RewardShop: FC = () => {
   const [tab, setTab] = useState<TabKey>("shop");
   const [catalog, setCatalog] = useState<RewardShopCatalog | null>(null);
   const [boosters, setBoosters] = useState<BoosterRow[]>([]);
+  const [boostMeta, setBoostMeta] = useState({ totalPages: 1, total: 0 });
   const [history, setHistory] = useState<RewardPurchaseRow[]>([]);
+  const [histMeta, setHistMeta] = useState({ totalPages: 1, total: 0 });
+  const [prodPage, setProdPage] = useState(1);
+  const [boostPage, setBoostPage] = useState(1);
+  const [histPage, setHistPage] = useState(1);
   const [selected, setSelected] = useState<RewardProduct | null>(null);
-  const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
 
   const loadCatalog = useCallback(async () => {
-    const r = await endpoints.rewardShop.products();
+    const r = await endpoints.rewardShop.products(prodPage);
     if (r?.success && r.data) setCatalog(r.data);
-  }, []);
+  }, [prodPage]);
 
   const loadBoosters = useCallback(async () => {
-    const r = await endpoints.rewardShop.boosters();
-    if (r?.success && r.data) setBoosters(r.data);
-  }, []);
+    const r = await endpoints.rewardShop.boosters(boostPage);
+    if (r?.success && r.data) {
+      setBoosters(r.data.data);
+      setBoostMeta(r.data.pagination);
+    }
+  }, [boostPage]);
 
   const loadHistory = useCallback(async () => {
-    const r = await endpoints.rewardShop.history();
-    if (r?.success && r.data) setHistory(r.data);
-  }, []);
+    const r = await endpoints.rewardShop.history(histPage);
+    if (r?.success && r.data) {
+      setHistory(r.data.data);
+      setHistMeta(r.data.pagination);
+    }
+  }, [histPage]);
 
   useEffect(() => {
-    (async () => {
-      try {
-        await Promise.all([loadCatalog(), loadBoosters(), loadHistory()]);
-      } finally {
-        setLoading(false);
-      }
-    })();
-  }, [loadCatalog, loadBoosters, loadHistory]);
+    loadCatalog();
+  }, [loadCatalog]);
+  useEffect(() => {
+    loadBoosters();
+  }, [loadBoosters]);
+  useEffect(() => {
+    loadHistory();
+  }, [loadHistory]);
 
+  const loading = catalog === null;
   const tokens = catalog?.tokens ?? 0;
-  const products = catalog?.products ?? [];
+  const products = catalog?.data ?? [];
+  const prodMeta = catalog?.pagination;
 
   // Group by the admin-chosen category label (Product / Booster / Voucher…),
   // preserving first-seen order so the catalog's priority order is honoured.
@@ -417,7 +430,7 @@ const RewardShop: FC = () => {
   const tabs: Array<{ key: TabKey; label: string; icon: typeof ShoppingBag; badge?: number }> =
     [
       { key: "shop", label: "Reward Shop", icon: ShoppingBag },
-      { key: "boosters", label: "My Boosters", icon: Zap, badge: boosters.length },
+      { key: "boosters", label: "My Boosters", icon: Zap, badge: boostMeta.total },
       { key: "history", label: "Shop History", icon: History },
     ];
 
@@ -482,12 +495,34 @@ const RewardShop: FC = () => {
                 ))}
               </Section>
             ))}
+            <Pagination
+              page={prodPage}
+              totalPages={prodMeta?.totalPages ?? 1}
+              total={prodMeta?.total}
+              onChange={setProdPage}
+            />
           </>
         )
       ) : tab === "boosters" ? (
-        <BoostersTab boosters={boosters} />
+        <>
+          <BoostersTab boosters={boosters} />
+          <Pagination
+            page={boostPage}
+            totalPages={boostMeta.totalPages}
+            total={boostMeta.total}
+            onChange={setBoostPage}
+          />
+        </>
       ) : (
-        <HistoryTab rows={history} />
+        <>
+          <HistoryTab rows={history} />
+          <Pagination
+            page={histPage}
+            totalPages={histMeta.totalPages}
+            total={histMeta.total}
+            onChange={setHistPage}
+          />
+        </>
       )}
     </DashboardLayout>
   );

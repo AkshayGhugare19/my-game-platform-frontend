@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState, type FC } from "react";
 import { toast } from "react-toastify";
 import DashboardLayout from "@/layout/DashboardLayout";
-import apiService from "@/services/api";
+import endpoints from "@/services/endpoints";
+import Pagination from "@/components/Pagination";
 import type { UserReward } from "@/types";
 
 const titleCase = (s: string) =>
@@ -10,11 +11,18 @@ const titleCase = (s: string) =>
 const Rewards: FC = () => {
   const [rewards, setRewards] = useState<UserReward[]>([]);
   const [claiming, setClaiming] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
 
   const load = useCallback(async () => {
-    const r = await apiService.get<UserReward[]>("/rewards");
-    if (r?.success && r.data) setRewards(r.data);
-  }, []);
+    const r = await endpoints.rewards.list(page);
+    if (r?.success && r.data) {
+      setRewards(r.data.data);
+      setTotalPages(r.data.pagination.totalPages);
+      setTotal(r.data.pagination.total);
+    }
+  }, [page]);
 
   useEffect(() => {
     load();
@@ -24,7 +32,7 @@ const Rewards: FC = () => {
     if (claiming) return;
     setClaiming(id);
     try {
-      const r = await apiService.post(`/rewards/${id}/claim`);
+      const r = await endpoints.rewards.claim(id);
       if (r?.success) {
         toast.success(r.message || "Reward claimed");
         await load();
@@ -98,6 +106,12 @@ const Rewards: FC = () => {
           </tbody>
         </table>
       </div>
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        total={total}
+        onChange={setPage}
+      />
     </DashboardLayout>
   );
 };

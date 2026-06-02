@@ -1,6 +1,7 @@
 import { useEffect, useState, type FC } from "react";
 import DashboardLayout from "@/layout/DashboardLayout";
 import endpoints, { type XpHistoryRow } from "@/services/endpoints";
+import Pagination from "@/components/Pagination";
 import type { GamificationProfile } from "@/types";
 
 const initials = (a: string, b: string) =>
@@ -22,22 +23,30 @@ const StatCard: FC<{
 const Profile: FC = () => {
   const [p, setP] = useState<GamificationProfile | null>(null);
   const [xp, setXp] = useState<XpHistoryRow[]>([]);
+  const [xpPage, setXpPage] = useState(1);
+  const [xpMeta, setXpMeta] = useState({ totalPages: 1, total: 0 });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     (async () => {
       try {
-        const [pr, hist] = await Promise.all([
-          endpoints.profile.get(),
-          endpoints.profile.xpHistory(1, 15),
-        ]);
+        const pr = await endpoints.profile.get();
         if (pr?.success && pr.data) setP(pr.data);
-        if (hist?.success && hist.data) setXp(hist.data.data);
       } finally {
         setLoading(false);
       }
     })();
   }, []);
+
+  useEffect(() => {
+    (async () => {
+      const hist = await endpoints.profile.xpHistory(xpPage, 15);
+      if (hist?.success && hist.data) {
+        setXp(hist.data.data);
+        setXpMeta(hist.data.pagination);
+      }
+    })();
+  }, [xpPage]);
 
   return (
     <DashboardLayout>
@@ -248,6 +257,12 @@ const Profile: FC = () => {
               </tbody>
             </table>
           </div>
+          <Pagination
+            page={xpPage}
+            totalPages={xpMeta.totalPages}
+            total={xpMeta.total}
+            onChange={setXpPage}
+          />
         </>
       )}
 

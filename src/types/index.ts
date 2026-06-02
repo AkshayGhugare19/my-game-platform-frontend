@@ -146,6 +146,13 @@ export interface LeaderboardRow {
   name?: string;
 }
 
+export interface LeaderboardData {
+  board: string;
+  rows: LeaderboardRow[];
+  me: LeaderboardRow | null;
+  pagination: PaginatedData<LeaderboardRow>["pagination"];
+}
+
 export interface NotificationItem {
   id: string;
   type: string;
@@ -215,9 +222,8 @@ export interface RewardProduct {
   affordable: boolean;
 }
 
-export interface RewardShopCatalog {
+export interface RewardShopCatalog extends PaginatedData<RewardProduct> {
   tokens: number;
-  products: RewardProduct[];
 }
 
 export interface BuyResult {

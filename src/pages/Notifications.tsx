@@ -1,20 +1,25 @@
 import { useCallback, useEffect, useState, type FC } from "react";
 import DashboardLayout from "@/layout/DashboardLayout";
-import apiService from "@/services/api";
+import endpoints from "@/services/endpoints";
+import Pagination from "@/components/Pagination";
 import { useSocket } from "@/context/SocketContext";
-import type { NotificationItem, PaginatedData } from "@/types";
+import type { NotificationItem } from "@/types";
 
 const Notifications: FC = () => {
   const [items, setItems] = useState<NotificationItem[]>([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
   const { on } = useSocket();
 
   const load = useCallback(async () => {
-    const r = await apiService.get<PaginatedData<NotificationItem>>(
-      "/notifications",
-      { page: 1, limit: 50 }
-    );
-    if (r?.success && r.data) setItems(r.data.data);
-  }, []);
+    const r = await endpoints.notifications.list(page);
+    if (r?.success && r.data) {
+      setItems(r.data.data);
+      setTotalPages(r.data.pagination.totalPages);
+      setTotal(r.data.pagination.total);
+    }
+  }, [page]);
 
   useEffect(() => {
     load();
@@ -23,7 +28,7 @@ const Notifications: FC = () => {
   }, [load, on]);
 
   const markAll = async () => {
-    await apiService.patch("/notifications/read-all");
+    await endpoints.notifications.markAllRead();
     load();
   };
 
@@ -63,6 +68,12 @@ const Notifications: FC = () => {
           <p className="text-slate-500">No notifications.</p>
         )}
       </div>
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        total={total}
+        onChange={setPage}
+      />
     </DashboardLayout>
   );
 };

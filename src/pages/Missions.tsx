@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useState, type FC } from "react";
 import { toast } from "react-toastify";
 import DashboardLayout from "@/layout/DashboardLayout";
-import apiService from "@/services/api";
+import endpoints from "@/services/endpoints";
+import Pagination from "@/components/Pagination";
 import type { ApiError, Mission } from "@/types";
 
 const statusColor: Record<string, string> = {
@@ -14,11 +15,18 @@ const statusColor: Record<string, string> = {
 
 const Missions: FC = () => {
   const [missions, setMissions] = useState<Mission[]>([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [total, setTotal] = useState(0);
 
   const load = useCallback(async () => {
-    const r = await apiService.get<Mission[]>("/missions");
-    if (r?.success && r.data) setMissions(r.data);
-  }, []);
+    const r = await endpoints.missions.list(page);
+    if (r?.success && r.data) {
+      setMissions(r.data.data);
+      setTotalPages(r.data.pagination.totalPages);
+      setTotal(r.data.pagination.total);
+    }
+  }, [page]);
 
   useEffect(() => {
     load();
@@ -26,7 +34,7 @@ const Missions: FC = () => {
 
   const claim = async (id: string) => {
     try {
-      const r = await apiService.post(`/missions/${id}/claim`);
+      const r = await endpoints.missions.claim(id);
       if (r?.success) {
         toast.success("Reward claimed!");
         load();
@@ -94,6 +102,12 @@ const Missions: FC = () => {
           <p className="text-slate-500">No missions yet.</p>
         )}
       </div>
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        total={total}
+        onChange={setPage}
+      />
     </DashboardLayout>
   );
 };

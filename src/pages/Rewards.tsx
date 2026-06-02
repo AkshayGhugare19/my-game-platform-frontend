@@ -48,25 +48,31 @@ const Rewards: FC = () => {
 
   return (
     <DashboardLayout>
-      <h1 className="text-2xl font-bold mb-6">My Rewards</h1>
+      <h1 className="text-2xl font-bold mb-6 animate-fade-in-down">
+        🎁 My Rewards
+      </h1>
       <div className="border border-slate-800 rounded-xl overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-slate-900">
+          <thead className="bg-slate-900/80 text-slate-400 uppercase text-xs tracking-wide">
             <tr>
-              <th className="p-3 text-left">Status</th>
-              <th className="p-3 text-left">Granted Date</th>
-              <th className="p-3 text-left">Source</th>
-              <th className="p-3 text-left">Reward Type</th>
-              <th className="p-3 text-left">Reward</th>
-              <th className="p-3 text-right">Action</th>
+              <th className="p-3 text-left font-medium">Status</th>
+              <th className="p-3 text-left font-medium">Granted Date</th>
+              <th className="p-3 text-left font-medium">Source</th>
+              <th className="p-3 text-left font-medium">Reward Type</th>
+              <th className="p-3 text-left font-medium">Reward</th>
+              <th className="p-3 text-right font-medium">Action</th>
             </tr>
           </thead>
           <tbody>
-            {rewards.map((r) => {
+            {rewards.map((r, i) => {
               const status = String(r.status ?? "").toUpperCase();
               const isPending = status === "IN_PROGRESS";
               return (
-                <tr key={r.id} className="border-t border-slate-800">
+                <tr
+                  key={r.id}
+                  style={{ animationDelay: `${i * 35}ms` }}
+                  className="border-t border-slate-800 transition-colors hover:bg-slate-800/40 animate-fade-in"
+                >
                   <td className="p-3">{titleCase(String(r.status ?? ""))}</td>
                   <td className="p-3 text-slate-400">
                     {r.granted_date
@@ -85,7 +91,7 @@ const Rewards: FC = () => {
                       <button
                         onClick={() => handleClaim(r.id)}
                         disabled={claiming === r.id}
-                        className="bg-indigo-600 hover:bg-indigo-500 disabled:opacity-60 text-white text-xs px-3 py-1.5 rounded-md"
+                        className="btn-primary text-xs px-3 py-1.5"
                       >
                         {claiming === r.id ? "Claiming…" : "Claim"}
                       </button>

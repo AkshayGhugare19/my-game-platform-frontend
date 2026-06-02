@@ -155,16 +155,19 @@ const DashboardLayout: FC<{ children: ReactNode }> = ({ children }) => {
         key={item.to}
         to={item.to}
         className={({ isActive }) =>
-          `flex items-center gap-3 px-3 py-2 rounded-md text-sm ${
+          `group flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-all duration-150 ${
             indent ? "ml-7 pl-3" : ""
           } ${
             isActive
-              ? "bg-indigo-600 text-white"
-              : "text-slate-300 hover:bg-slate-800"
+              ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/30"
+              : "text-slate-300 hover:bg-slate-800 hover:translate-x-0.5"
           }`
         }
       >
-        <Icon size={indent ? 16 : 18} />
+        <Icon
+          size={indent ? 16 : 18}
+          className="shrink-0 transition-transform group-hover:scale-110"
+        />
         <span className="flex-1">{item.label}</span>
         {badge !== null && (
           <span className="bg-red-500 text-white text-[10px] font-semibold rounded-full min-w-[20px] h-5 px-1.5 flex items-center justify-center">
@@ -209,12 +212,15 @@ const DashboardLayout: FC<{ children: ReactNode }> = ({ children }) => {
   };
 
   return (
-    <div className="min-h-screen flex bg-slate-950 text-white">
-      <aside className="w-60 bg-slate-900 border-r border-slate-800 flex flex-col">
-        <div className="p-5 text-xl font-bold tracking-tight">
-          🎮 Gamify<span className="text-indigo-400">Engage</span>
+    <div className="h-screen flex overflow-hidden bg-slate-950 text-white">
+      <aside className="w-60 shrink-0 h-screen bg-slate-900 border-r border-slate-800 flex flex-col">
+        <div className="p-5 text-xl font-bold tracking-tight shrink-0">
+          <span className="mr-1 inline-block animate-float">🎮</span>Gamify
+          <span className="bg-gradient-to-r from-indigo-400 to-fuchsia-400 bg-clip-text text-transparent">
+            Engage
+          </span>
         </div>
-        <nav className="flex-1 px-3 space-y-1 overflow-y-auto">
+        <nav className="flex-1 min-h-0 px-3 space-y-1 overflow-y-auto">
           {nav.map((item) =>
             isGroup(item) ? renderGroup(item) : renderLeaf(item)
           )}
@@ -224,30 +230,35 @@ const DashboardLayout: FC<{ children: ReactNode }> = ({ children }) => {
             logout();
             navigate("/login");
           }}
-          className="m-3 flex items-center gap-2 px-3 py-2 rounded-md text-sm bg-slate-800 hover:bg-red-600"
+          className="m-3 shrink-0 flex items-center gap-2 px-3 py-2 rounded-md text-sm bg-slate-800 hover:bg-red-600"
         >
           <LogOut size={18} /> Logout
         </button>
       </aside>
 
-      <div className="flex-1 flex flex-col">
-        <header className="h-14 border-b border-slate-800 flex items-center justify-between px-6">
+      <div className="flex-1 min-w-0 flex flex-col h-screen">
+        <header className="h-14 shrink-0 border-b border-slate-800 flex items-center justify-between px-6 bg-slate-950/80 backdrop-blur-md">
           <div className="text-sm text-slate-400">
-            Welcome back, {user?.first_name ?? "Player"}
+            Welcome back,{" "}
+            <span className="font-medium text-slate-200">
+              {user?.first_name ?? "Player"}
+            </span>
           </div>
           <NavLink
             to="/notifications"
-            className="relative p-2 rounded-md hover:bg-slate-800"
+            className="relative p-2 rounded-md text-slate-300 transition-colors hover:bg-slate-800 hover:text-white"
           >
             <Bell size={20} />
             {unread > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-xs rounded-full w-5 h-5 flex items-center justify-center">
+              <span className="absolute -top-1 -right-1 bg-red-500 text-xs rounded-full w-5 h-5 flex items-center justify-center ring-2 ring-slate-950 animate-pulse-glow">
                 {unread}
               </span>
             )}
           </NavLink>
         </header>
-        <main className="flex-1 p-6 overflow-auto">{children}</main>
+        <main key={location.pathname} className="flex-1 min-h-0 p-6 overflow-y-auto animate-fade-in">
+          {children}
+        </main>
       </div>
     </div>
   );

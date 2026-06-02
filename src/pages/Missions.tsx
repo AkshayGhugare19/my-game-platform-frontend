@@ -46,9 +46,11 @@ const Missions: FC = () => {
 
   return (
     <DashboardLayout>
-      <h1 className="text-2xl font-bold mb-6">Missions</h1>
+      <h1 className="text-2xl font-bold mb-6 animate-fade-in-down">
+        🎯 Missions
+      </h1>
       <div className="grid md:grid-cols-2 gap-4">
-        {missions.map((m) => {
+        {missions.map((m, i) => {
           const pct = Math.min(
             100,
             Math.round((m.progress / m.target) * 100)
@@ -56,7 +58,8 @@ const Missions: FC = () => {
           return (
             <div
               key={m.id}
-              className="bg-slate-900 border border-slate-800 rounded-xl p-5"
+              style={{ animationDelay: `${i * 50}ms` }}
+              className="card-interactive bg-slate-900 border border-slate-800 rounded-xl p-5 animate-fade-in-up"
             >
               <div className="flex justify-between items-start">
                 <div>
@@ -75,7 +78,7 @@ const Missions: FC = () => {
               </div>
               <div className="mt-3 h-2 bg-slate-800 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-indigo-500"
+                  className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 transition-all duration-700"
                   style={{ width: `${pct}%` }}
                 />
               </div>
@@ -90,7 +93,7 @@ const Missions: FC = () => {
               {m.status === "COMPLETED" && (
                 <button
                   onClick={() => claim(m.id)}
-                  className="mt-3 w-full bg-emerald-600 hover:bg-emerald-500 py-2 rounded text-sm"
+                  className="mt-3 w-full rounded-lg bg-emerald-600 py-2 text-sm font-medium transition-all hover:bg-emerald-500 hover:shadow-lg hover:shadow-emerald-500/30 active:scale-[0.98]"
                 >
                   Claim reward
                 </button>

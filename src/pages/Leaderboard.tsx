@@ -36,18 +36,27 @@ const Leaderboard: FC = () => {
     return off;
   }, [board, page, on]);
 
+  const rankBadge = (rank: number) => {
+    if (rank === 1) return "🥇";
+    if (rank === 2) return "🥈";
+    if (rank === 3) return "🥉";
+    return null;
+  };
+
   return (
     <DashboardLayout>
-      <h1 className="text-2xl font-bold mb-4">Leaderboard</h1>
-      <div className="flex gap-2 mb-4">
+      <h1 className="text-2xl font-bold mb-4 animate-fade-in-down">
+        🏆 Leaderboard
+      </h1>
+      <div className="mb-4 inline-flex gap-1 rounded-xl border border-slate-800 bg-slate-900/60 p-1">
         {(["global", "weekly", "monthly"] as Board[]).map((b) => (
           <button
             key={b}
             onClick={() => switchBoard(b)}
-            className={`px-4 py-2 rounded text-sm capitalize ${
+            className={`rounded-lg px-4 py-2 text-sm capitalize transition-all ${
               board === b
-                ? "bg-indigo-600"
-                : "bg-slate-800 hover:bg-slate-700"
+                ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/30"
+                : "text-slate-400 hover:bg-slate-800 hover:text-slate-200"
             }`}
           >
             {b}
@@ -56,26 +65,45 @@ const Leaderboard: FC = () => {
       </div>
 
       {me && (
-        <div className="bg-indigo-600/20 border border-indigo-500 rounded-lg p-3 mb-4 text-sm">
-          Your position: <b>#{me.rank}</b> · {me.score} XP
+        <div className="relative overflow-hidden bg-gradient-to-r from-indigo-600/20 to-fuchsia-600/10 border border-indigo-500/40 rounded-xl p-4 mb-4 text-sm animate-fade-in-up">
+          <div className="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full bg-indigo-500/10 blur-2xl" />
+          Your position:{" "}
+          <b className="text-indigo-300 text-base">#{me.rank}</b> ·{" "}
+          <span className="text-amber-400 font-medium">{me.score} XP</span>
         </div>
       )}
 
       <div className="border border-slate-800 rounded-xl overflow-hidden">
         <table className="w-full text-sm">
-          <thead className="bg-slate-900">
+          <thead className="bg-slate-900/80 text-slate-400 uppercase text-xs tracking-wide">
             <tr>
-              <th className="p-3 text-left w-16">#</th>
-              <th className="p-3 text-left">Player</th>
-              <th className="p-3 text-right">XP</th>
+              <th className="p-3 text-left w-16 font-medium">#</th>
+              <th className="p-3 text-left font-medium">Player</th>
+              <th className="p-3 text-right font-medium">XP</th>
             </tr>
           </thead>
           <tbody>
-            {rows.map((r) => (
-              <tr key={r.userId} className="border-t border-slate-800">
-                <td className="p-3 font-bold">{r.rank}</td>
-                <td className="p-3">{r.name ?? "Player"}</td>
-                <td className="p-3 text-right">{r.score}</td>
+            {rows.map((r, i) => (
+              <tr
+                key={r.userId}
+                style={{ animationDelay: `${i * 35}ms` }}
+                className={`border-t border-slate-800 transition-colors animate-fade-in ${
+                  r.rank <= 3
+                    ? "bg-amber-500/[0.04] hover:bg-amber-500/10"
+                    : "hover:bg-slate-800/40"
+                }`}
+              >
+                <td className="p-3 font-bold">
+                  <span className="inline-flex items-center gap-1.5">
+                    {rankBadge(r.rank) ?? (
+                      <span className="text-slate-400">{r.rank}</span>
+                    )}
+                  </span>
+                </td>
+                <td className="p-3 font-medium">{r.name ?? "Player"}</td>
+                <td className="p-3 text-right text-emerald-400 font-semibold">
+                  {r.score}
+                </td>
               </tr>
             ))}
             {rows.length === 0 && (

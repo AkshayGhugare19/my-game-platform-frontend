@@ -12,6 +12,9 @@ import type {
   RecordActivityPayload,
   RewardPurchaseRow,
   RewardShopCatalog,
+  TournamentDetailResult,
+  TournamentHistoryEntry,
+  TournamentListResult,
   UserReward,
   Wallet,
 } from "@/types";
@@ -58,10 +61,33 @@ const endpoints = {
 
   /** /api/activity — record a gameplay / bet event (XP rewards participation). */
   activity: {
-    record: (
+    record: async (
       payload: RecordActivityPayload
-    ): Promise<ApiResponse<ActivityResult>> =>
-      apiService.post<ActivityResult>("/activity", payload),
+    ): Promise<ApiResponse<ActivityResult>> => {
+      const res = await apiService.post<ActivityResult>("/activity", payload);
+      // When a game is launched from a tournament (`?tournament=<id>` in the
+      // URL), mirror the points earned to that tournament's leaderboard.
+      // Best-effort: never let scoring break the play result.
+      try {
+        const tid = new URLSearchParams(window.location.search).get(
+          "tournament"
+        );
+        if (tid && res?.success) {
+          const game =
+            typeof payload.meta?.game === "string" ? payload.meta.game : null;
+          const points = Math.max(0, Math.round(Number(payload.amount) || 0));
+          if (points > 0) {
+            await apiService.post(`/tournaments/${tid}/score`, {
+              points,
+              game,
+            });
+          }
+        }
+      } catch {
+        /* tournament scoring is best-effort */
+      }
+      return res;
+    },
   },
 
   /**
@@ -119,6 +145,22 @@ const endpoints = {
       apiService.get<PaginatedData<Mission>>("/missions", { page, limit }),
     claim: (id: string): Promise<ApiResponse<unknown>> =>
       apiService.post(`/missions/${id}/claim`),
+  },
+
+  /** /api/tournaments — Gamru-authored tournaments the player can join. */
+  tournaments: {
+    list: (): Promise<ApiResponse<TournamentListResult>> =>
+      apiService.get<TournamentListResult>("/tournaments"),
+    get: (id: string): Promise<ApiResponse<TournamentDetailResult>> =>
+      apiService.get<TournamentDetailResult>(`/tournaments/${id}`),
+    history: (): Promise<ApiResponse<TournamentHistoryEntry[]>> =>
+      apiService.get<TournamentHistoryEntry[]>("/tournaments/history"),
+    score: (
+      id: string,
+      points: number,
+      game?: string | null
+    ): Promise<ApiResponse<{ tournament_id: string; score: number; applied: number }>> =>
+      apiService.post(`/tournaments/${id}/score`, { points, game }),
   },
 
   /** /api/leaderboard — global / weekly / monthly boards. */

@@ -263,3 +263,75 @@ export interface BoosterRow {
   secondsRemaining: number | null;
   createdAt: string;
 }
+
+// ─── Tournaments (sourced from Gamru) ───────────────────────────────────────
+
+export type TournamentState = "SCHEDULED" | "IN_PROGRESS" | "ENDED";
+
+export interface Tournament {
+  id: string;
+  name: string;
+  description: string | null;
+  industry: string;
+  tournament_type: string | null;
+  games: string[];
+  period: string | null;
+  large_image: string | null;
+  small_image: string | null;
+  min_bet: number | null;
+  max_bets: number | null;
+  buy_in: number | null;
+  start_date: string | null;
+  end_date: string | null;
+  leaderboard_size: number | null;
+  prize_pool: number | null;
+  eligibility_type: string | null;
+  segment: string | null;
+  tags: string[];
+  state: TournamentState;
+}
+
+export interface TournamentBranding {
+  banner_desktop: string | null;
+  banner_mobile: string | null;
+  tag_color_casino: string;
+  tag_color_sport: string;
+}
+
+export interface TournamentLeaderboardEntry {
+  rank: number;
+  user_id: string;
+  name: string;
+  score: number;
+  is_me: boolean;
+}
+
+export interface TournamentListResult {
+  branding: TournamentBranding;
+  tournaments: Tournament[];
+}
+
+export interface TournamentDetailResult {
+  branding: TournamentBranding;
+  tournament: Tournament;
+  leaderboard: TournamentLeaderboardEntry[];
+}
+
+export interface TournamentHistoryGame {
+  game: string;
+  plays: number;
+}
+
+export interface TournamentHistoryEntry {
+  tournament_id: string;
+  name: string;
+  player_name: string;
+  player_email: string | null;
+  industry: string;
+  image: string | null;
+  plays: number;
+  games_played: TournamentHistoryGame[];
+  xp: number;
+  rank: number;
+  last_played_at: string | null;
+}

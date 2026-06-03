@@ -24,6 +24,7 @@ import {
   Wallet,
   ShoppingBag,
   ChevronDown,
+  Swords,
   type LucideIcon,
   LineSquiggle,
   TrophyIcon,
@@ -53,6 +54,7 @@ interface NavGroup {
 const nav: Array<NavItem | NavGroup> = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/missions", label: "Missions", icon: Target },
+  { to: "/tournaments", label: "Tournaments", icon: Swords },
   { to: "/rewards", label: "Rewards", icon: Gift, badgeKey: "rewards" },
   { to: "/reward-shop", label: "My Reward Shop", icon: ShoppingBag },
   { to: "/deposit", label: "Deposit", icon: Wallet },

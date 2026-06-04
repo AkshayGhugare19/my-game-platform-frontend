@@ -16,6 +16,7 @@ import DashboardLayout from "@/layout/DashboardLayout";
 import endpoints from "@/services/endpoints";
 import TournamentGamesModal from "@/components/TournamentGamesModal";
 import TournamentHistory from "@/components/TournamentHistory";
+import Countdown from "@/components/Countdown";
 import { gameMeta } from "@/config/gamesCatalog";
 import type {
   ApiError,
@@ -136,6 +137,9 @@ const TournamentCard: FC<{
               Starts {t.start_date}
             </p>
           )}
+          <div className="mt-2">
+            <Countdown end={t.end_date} />
+          </div>
         </div>
       </button>
 

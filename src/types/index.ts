@@ -304,6 +304,8 @@ export interface TournamentLeaderboardEntry {
   name: string;
   score: number;
   is_me: boolean;
+  /** Prize-pool share credited to this player once the tournament ended (top-3). */
+  prize?: number;
 }
 
 export interface TournamentListResult {

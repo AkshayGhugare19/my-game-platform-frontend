@@ -124,8 +124,15 @@ const LeaderboardList: FC<{ board: TournamentLeaderboardEntry[] }> = ({
                 </span>
               </span>
             </span>
-            <span className="text-sm font-extrabold text-white">
-              {e.score.toLocaleString()}
+            <span className="flex flex-col items-end">
+              <span className="text-sm font-extrabold text-white">
+                {e.score.toLocaleString()}
+              </span>
+              {e.prize ? (
+                <span className="text-[11px] font-bold text-emerald-400">
+                  +${e.prize.toLocaleString()}
+                </span>
+              ) : null}
             </span>
           </li>
         );

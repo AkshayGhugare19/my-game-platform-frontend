@@ -11,6 +11,7 @@ const initial = {
   email: "",
   mobile: "",
   password: "",
+  source: "GAMIFY_ENGAGE",
 };
 
 const Register: FC = () => {
@@ -29,6 +30,7 @@ const Register: FC = () => {
       setErrors({});
       const res = await apiService.post("/auth/register", {
         ...form,
+        source: form.source || "GAMIFY_ENGAGE",
         password: await encryptPassword(form.password),
       });
       if (res?.success) {

@@ -109,18 +109,57 @@ export interface GamificationProfile {
   logs: ActivityLog[];
 }
 
+/**
+ * A mission as authored in Gamru and served by /api/missions. The player's
+ * participation (status + progress) is merged in by the games backend.
+ */
+export type MissionStatus =
+  | "AVAILABLE"
+  | "IN_PROGRESS"
+  | "COMPLETED"
+  | "CLAIMED";
+
 export interface Mission {
   id: string;
-  code: string;
-  title: string;
-  description: string;
-  type: string;
-  metric: string;
+  name: string;
+  description: string | null;
+  category: string; // Slots / Originals / Sport / …
+  bucket: "Casino" | "Sport";
+  vip: boolean;
+  duration_days: number | null;
+  large_image: string | null;
+  status: MissionStatus;
+  objective_type: string;
+  measure: string; // "count" | "amount"
   target: number;
-  reward_xp: number;
-  reward_coins: number;
   progress: number;
-  status: "LOCKED" | "IN_PROGRESS" | "COMPLETED" | "CLAIMED" | "EXPIRED";
+  condition: string; // e.g. "Wager $15 000"
+  game_category: string | null;
+  min_bet: number | null;
+  min_multiplier: number | null;
+  bet_currency: string;
+  games: string[];
+  start_date: string | null;
+  end_date: string | null;
+  reward_type: string;
+  reward_amount: number;
+  reward_label: string; // e.g. "50 Bonus Bets x $2"
+  max_bonus: number | null;
+  bonus_wagering: string;
+  deposit_required: boolean;
+  wagering_required: boolean;
+  more_details: string | null;
+  tags: string[];
+}
+
+export interface MissionBranding {
+  banner_desktop: string | null;
+  banner_mobile: string | null;
+}
+
+export interface MissionListResult {
+  branding: MissionBranding;
+  missions: Mission[];
 }
 
 /**

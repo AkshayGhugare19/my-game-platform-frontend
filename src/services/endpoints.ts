@@ -7,6 +7,7 @@ import type {
   GamificationProfile,
   LeaderboardData,
   Mission,
+  MissionListResult,
   NotificationItem,
   PaginatedData,
   RecordActivityPayload,
@@ -136,15 +137,22 @@ const endpoints = {
       apiService.post(`/rewards/${id}/claim`),
   },
 
-  /** /api/missions — the player's missions with progress. */
+  /**
+   * /api/missions — Gamru-authored missions the player can join, progress and
+   * claim. The catalog is fetched live from gamru with the player's
+   * participation merged in.
+   */
   missions: {
-    list: (
-      page = 1,
-      limit = 10
-    ): Promise<ApiResponse<PaginatedData<Mission>>> =>
-      apiService.get<PaginatedData<Mission>>("/missions", { page, limit }),
-    claim: (id: string): Promise<ApiResponse<unknown>> =>
+    list: (): Promise<ApiResponse<MissionListResult>> =>
+      apiService.get<MissionListResult>("/missions"),
+    get: (id: string): Promise<ApiResponse<Mission>> =>
+      apiService.get<Mission>(`/missions/${id}`),
+    join: (id: string): Promise<ApiResponse<Mission>> =>
+      apiService.post<Mission>(`/missions/${id}/join`),
+    claim: (id: string): Promise<ApiResponse<{ reward_label: string }>> =>
       apiService.post(`/missions/${id}/claim`),
+    cancel: (id: string): Promise<ApiResponse<unknown>> =>
+      apiService.post(`/missions/${id}/cancel`),
   },
 
   /** /api/tournaments — Gamru-authored tournaments the player can join. */

@@ -93,7 +93,10 @@ const MissionCard: FC<{ m: Mission; onOpen: () => void }> = ({ m, onOpen }) => (
         </span>
       </div>
       <div className="truncate text-sm font-semibold text-slate-100">
-        {m.name}
+        Name: {m.name}
+      </div>
+      <div className="truncate text-sm font-semibold text-slate-100">
+        Reward: {m.reward_amount} {m.reward_type}
       </div>
       <div className="mt-2 flex items-center gap-2 rounded-lg bg-slate-800/70 px-2.5 py-1.5">
         <Gift size={14} className="shrink-0 text-violet-300" />
@@ -201,6 +204,9 @@ const MissionDetails: FC<{
           <div className="text-base font-bold text-white">
             {m.reward_label}
           </div>
+          <div className="text-xs uppercase tracking-wide text-slate-400 mt-1">
+            Target: {m.condition}
+          </div>
         </div>
       </div>
 
@@ -220,8 +226,10 @@ const MissionDetails: FC<{
             </span>
           }
         />
+        <Row label="Reward" value={m.reward_amount} />
+        <Row label="Reward type" value={m.reward_type} />
         <Row label="Mission type" value={m.category} />
-        <Row label="Condition" value={m.condition} />
+        <Row label="Target Condition" value={m.condition} />
         {m.min_bet != null && <Row label="Min bet" value={`$${m.min_bet}`} />}
         {m.min_multiplier != null && (
           <Row label="Min multiplier" value={`X${m.min_multiplier}`} />

@@ -163,6 +163,33 @@ export interface MissionListResult {
 }
 
 /**
+ * A mission bundle as authored in Gamru and served by /api/mission-bundles.
+ * A bundle is a curated GROUPING of missions — it has no reward of its own;
+ * the player joins/claims each grouped mission individually (reusing the
+ * mission flow). `completed`/`total` give the bundle's aggregate progress.
+ */
+export interface MissionBundle {
+  id: string;
+  name: string;
+  description: string | null;
+  large_image: string | null;
+  small_image: string | null;
+  bundle_type: string | null;
+  periodicity: string | null;
+  priority: number;
+  eligibility_type: string | null;
+  tags: string[];
+  missions: Mission[];
+  total: number;
+  completed: number;
+}
+
+export interface MissionBundleListResult {
+  branding: MissionBranding;
+  bundles: MissionBundle[];
+}
+
+/**
  * Reward row as returned by gamru (`player_rewards`). Mission/level
  * rewards auto-granted by gamru and admin-issued manual rewards both
  * share this shape — only `gamification_source` and `is_manual` differ.

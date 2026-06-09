@@ -8,6 +8,8 @@ import type {
   LeaderboardData,
   Mission,
   MissionListResult,
+  MissionBundle,
+  MissionBundleListResult,
   NotificationItem,
   PaginatedData,
   RecordActivityPayload,
@@ -153,6 +155,18 @@ const endpoints = {
       apiService.post(`/missions/${id}/claim`),
     cancel: (id: string): Promise<ApiResponse<unknown>> =>
       apiService.post(`/missions/${id}/cancel`),
+  },
+
+  /**
+   * /api/mission-bundles — Gamru-authored bundles that GROUP missions. Read
+   * only: each bundle's grouped missions are joined/claimed through the
+   * /missions endpoints above.
+   */
+  missionBundles: {
+    list: (): Promise<ApiResponse<MissionBundleListResult>> =>
+      apiService.get<MissionBundleListResult>("/mission-bundles"),
+    get: (id: string): Promise<ApiResponse<MissionBundle>> =>
+      apiService.get<MissionBundle>(`/mission-bundles/${id}`),
   },
 
   /** /api/tournaments — Gamru-authored tournaments the player can join. */

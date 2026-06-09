@@ -21,6 +21,7 @@ import {
   Brain,
   Zap,
   SlidersHorizontal,
+  Layers,
   Wallet,
   ShoppingBag,
   ChevronDown,
@@ -54,6 +55,7 @@ interface NavGroup {
 const nav: Array<NavItem | NavGroup> = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/missions", label: "Missions", icon: Target },
+  { to: "/mission-bundles", label: "Mission Bundles", icon: Layers },
   { to: "/tournaments", label: "Tournaments", icon: Swords },
   { to: "/rewards", label: "Rewards", icon: Gift, badgeKey: "rewards" },
   { to: "/reward-shop", label: "My Reward Shop", icon: ShoppingBag },

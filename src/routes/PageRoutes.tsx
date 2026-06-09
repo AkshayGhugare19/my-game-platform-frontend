@@ -7,6 +7,7 @@ import Register from "@/pages/Register";
 import Dashboard from "@/pages/Dashboard";
 import Profile from "@/pages/Profile";
 import Missions from "@/pages/Missions";
+import MissionBundles from "@/pages/MissionBundles";
 import Tournaments from "@/pages/Tournaments";
 import TournamentDetail from "@/pages/TournamentDetail";
 import Rewards from "@/pages/Rewards";
@@ -39,6 +40,7 @@ const PageRoutes: FC = () => (
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/missions" element={<Missions />} />
+      <Route path="/mission-bundles" element={<MissionBundles />} />
       <Route path="/tournaments" element={<Tournaments />} />
       <Route path="/tournaments/:id" element={<TournamentDetail />} />
       <Route path="/rewards" element={<Rewards />} />

@@ -176,7 +176,19 @@ export const MissionDetails: FC<{
   onClaim: () => void;
   onCancel: () => void;
   onPlay: (key: string) => void;
-}> = ({ m, busy, onClose, onJoin, onClaim, onCancel, onPlay }) => (
+  /** When set, a COMPLETED mission can't be claimed yet — shows this reason
+   * instead of the Claim button (used by bundles: claim only when all done). */
+  claimLockedReason?: string | null;
+}> = ({
+  m,
+  busy,
+  onClose,
+  onJoin,
+  onClaim,
+  onCancel,
+  onPlay,
+  claimLockedReason = null,
+}) => (
   <div className="fixed inset-0 z-50 flex justify-end">
     <button
       aria-label="Close"
@@ -318,15 +330,20 @@ export const MissionDetails: FC<{
             </button>
           </div>
         )}
-        {m.status === "COMPLETED" && (
-          <button
-            disabled={busy}
-            onClick={onClaim}
-            className="w-full rounded-xl bg-emerald-600 py-3 text-sm font-bold text-white transition-all hover:bg-emerald-500 disabled:opacity-50"
-          >
-            {busy ? "Claiming…" : "Claim Reward"}
-          </button>
-        )}
+        {m.status === "COMPLETED" &&
+          (claimLockedReason ? (
+            <div className="rounded-xl bg-slate-800/80 py-3 text-center text-sm font-semibold text-amber-300 ring-1 ring-amber-500/20">
+              {claimLockedReason}
+            </div>
+          ) : (
+            <button
+              disabled={busy}
+              onClick={onClaim}
+              className="w-full rounded-xl bg-emerald-600 py-3 text-sm font-bold text-white transition-all hover:bg-emerald-500 disabled:opacity-50"
+            >
+              {busy ? "Claiming…" : "Claim Reward"}
+            </button>
+          ))}
         {m.status === "CLAIMED" && (
           <div className="rounded-xl bg-indigo-500/10 py-3 text-center text-sm font-semibold text-indigo-300 ring-1 ring-indigo-500/20">
             Reward claimed — see your Bonuses page

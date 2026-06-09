@@ -89,15 +89,24 @@ const MissionBundles: FC = () => {
     load();
   }, [load]);
 
-  // The opened mission may live in any bundle — flatten to find it.
-  const open: Mission | null = useMemo(() => {
-    if (!openId) return null;
+  // The opened mission may live in any bundle — find it and its bundle.
+  const { open, openBundle } = useMemo<{
+    open: Mission | null;
+    openBundle: MissionBundle | null;
+  }>(() => {
+    if (!openId) return { open: null, openBundle: null };
     for (const b of bundles) {
       const m = b.missions.find((x) => x.id === openId);
-      if (m) return m;
+      if (m) return { open: m, openBundle: b };
     }
-    return null;
+    return { open: null, openBundle: null };
   }, [bundles, openId]);
+
+  // A bundle's missions can only be claimed once every mission in it is done.
+  const claimLockedReason =
+    openBundle && openBundle.completed < openBundle.total
+      ? `Complete all ${openBundle.total} missions in this bundle to claim`
+      : null;
 
   const act = async (
     fn: () => Promise<{ success: boolean; message: string }>,
@@ -149,18 +158,22 @@ const MissionBundles: FC = () => {
           busy={busy}
           onClose={() => setOpenId(null)}
           onJoin={() =>
-            act(() => endpoints.missions.join(open.id), "Mission joined!")
+            act(() => endpoints.missionBundles.join(open.id), "Mission joined!")
           }
           onClaim={() =>
             act(
-              () => endpoints.missions.claim(open.id),
+              () => endpoints.missionBundles.claim(open.id),
               "Reward credited to your Bonuses!"
             )
           }
           onCancel={() =>
-            act(() => endpoints.missions.cancel(open.id), "Mission cancelled")
+            act(
+              () => endpoints.missionBundles.cancel(open.id),
+              "Mission cancelled"
+            )
           }
           onPlay={(key) => navigate(`/games/${key}?mission=${open.id}`)}
+          claimLockedReason={claimLockedReason}
         />
       )}
     </DashboardLayout>

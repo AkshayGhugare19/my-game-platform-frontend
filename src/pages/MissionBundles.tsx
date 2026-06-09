@@ -168,7 +168,7 @@ const MissionBundles: FC = () => {
     try {
       let claimed = 0;
       for (const m of pending) {
-        const r = await endpoints.missionBundles.claim(m.id);
+        const r = await endpoints.missionBundles.claim(bundle.id, m.id);
         if (r?.success) claimed += 1;
         else toast.error(r?.message || `Couldn't claim “${m.name}”`);
       }
@@ -218,17 +218,23 @@ const MissionBundles: FC = () => {
           busy={busy}
           onClose={() => setOpenId(null)}
           onJoin={() =>
-            act(() => endpoints.missionBundles.join(open.id), "Mission joined!")
+            openBundle &&
+            act(
+              () => endpoints.missionBundles.join(openBundle.id, open.id),
+              "Mission joined!"
+            )
           }
           onClaim={() =>
+            openBundle &&
             act(
-              () => endpoints.missionBundles.claim(open.id),
+              () => endpoints.missionBundles.claim(openBundle.id, open.id),
               "Reward credited to your Bonuses!"
             )
           }
           onCancel={() =>
+            openBundle &&
             act(
-              () => endpoints.missionBundles.cancel(open.id),
+              () => endpoints.missionBundles.cancel(openBundle.id, open.id),
               "Mission cancelled"
             )
           }

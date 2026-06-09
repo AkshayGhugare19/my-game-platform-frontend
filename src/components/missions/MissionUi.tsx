@@ -346,7 +346,7 @@ export const MissionDetails: FC<{
           ))}
         {m.status === "CLAIMED" && (
           <div className="rounded-xl bg-indigo-500/10 py-3 text-center text-sm font-semibold text-indigo-300 ring-1 ring-indigo-500/20">
-            Reward claimed — see your Bonuses page
+            Reward claimed — see your Mission bundle card
           </div>
         )}
       </div>

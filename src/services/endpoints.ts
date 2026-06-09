@@ -167,14 +167,26 @@ const endpoints = {
       apiService.get<MissionBundleListResult>("/mission-bundles"),
     get: (id: string): Promise<ApiResponse<MissionBundle>> =>
       apiService.get<MissionBundle>(`/mission-bundles/${id}`),
-    // Join/claim/cancel a mission ON THE BUNDLE TRACK — independent of the
-    // standalone Missions tab (`id` is the mission id).
-    join: (id: string): Promise<ApiResponse<Mission>> =>
-      apiService.post<Mission>(`/mission-bundles/missions/${id}/join`),
-    claim: (id: string): Promise<ApiResponse<{ reward_label: string }>> =>
-      apiService.post(`/mission-bundles/missions/${id}/claim`),
-    cancel: (id: string): Promise<ApiResponse<unknown>> =>
-      apiService.post(`/mission-bundles/missions/${id}/cancel`),
+    // Join/claim/cancel a mission ON A BUNDLE'S OWN TRACK — independent of the
+    // standalone Missions tab and of other bundles (scoped by bundleId).
+    join: (bundleId: string, missionId: string): Promise<ApiResponse<Mission>> =>
+      apiService.post<Mission>(
+        `/mission-bundles/${bundleId}/missions/${missionId}/join`
+      ),
+    claim: (
+      bundleId: string,
+      missionId: string
+    ): Promise<ApiResponse<{ reward_label: string }>> =>
+      apiService.post(
+        `/mission-bundles/${bundleId}/missions/${missionId}/claim`
+      ),
+    cancel: (
+      bundleId: string,
+      missionId: string
+    ): Promise<ApiResponse<unknown>> =>
+      apiService.post(
+        `/mission-bundles/${bundleId}/missions/${missionId}/cancel`
+      ),
   },
 
   /** /api/tournaments — Gamru-authored tournaments the player can join. */

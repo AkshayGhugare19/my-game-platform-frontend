@@ -178,6 +178,7 @@ export interface MissionBundle {
   periodicity: string | null;
   priority: number;
   eligibility_type: string | null;
+  segments: string[];
   tags: string[];
   missions: Mission[];
   total: number;

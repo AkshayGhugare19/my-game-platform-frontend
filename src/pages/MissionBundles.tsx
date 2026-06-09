@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, type FC } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { Layers, Package } from "lucide-react";
+import { Gift, Layers, Package } from "lucide-react";
 import DashboardLayout from "@/layout/DashboardLayout";
 import endpoints from "@/services/endpoints";
 import { MissionCard, MissionDetails } from "@/components/missions/MissionUi";
@@ -18,8 +18,19 @@ const Chip: FC<{ children: React.ReactNode }> = ({ children }) => (
 
 const BundleSection: FC<{
   bundle: MissionBundle;
+  busy: boolean;
   onOpenMission: (id: string) => void;
-}> = ({ bundle, onOpenMission }) => (
+  onClaim: () => void;
+}> = ({ bundle, busy, onOpenMission, onClaim }) => {
+  // The bundle is claimable only once every mission is done. Reward is granted
+  // for all its missions at once; once each is claimed the bundle is settled.
+  const allDone = bundle.total > 0 && bundle.completed === bundle.total;
+  const pending = bundle.missions.filter((m) => m.status === "COMPLETED").length;
+  const settled =
+    bundle.missions.length > 0 &&
+    bundle.missions.every((m) => m.status === "CLAIMED");
+
+  return (
   <section className="mb-6 rounded-3xl bg-slate-900/60 p-5 ring-1 ring-white/10">
     <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
       <div className="flex min-w-0 items-center gap-3">
@@ -42,7 +53,7 @@ const BundleSection: FC<{
         </div>
       </div>
 
-      <div className="w-44 shrink-0">
+      <div className="w-52 shrink-0">
         <div className="mb-1 flex justify-between text-[11px] text-slate-400">
           <span>Completed</span>
           <span>
@@ -55,6 +66,25 @@ const BundleSection: FC<{
             style={{ width: `${bundlePct(bundle)}%` }}
           />
         </div>
+
+        {settled ? (
+          <div className="mt-3 rounded-xl bg-indigo-500/10 py-2 text-center text-xs font-semibold text-indigo-300 ring-1 ring-indigo-500/20">
+            Rewards claimed
+          </div>
+        ) : allDone && pending > 0 ? (
+          <button
+            disabled={busy}
+            onClick={onClaim}
+            className="mt-3 flex w-full items-center justify-center gap-1.5 rounded-xl bg-emerald-600 py-2 text-xs font-bold text-white transition-all hover:bg-emerald-500 disabled:opacity-50"
+          >
+            <Gift size={14} />
+            {busy ? "Claiming…" : "Claim Bundle Reward"}
+          </button>
+        ) : (
+          <div className="mt-3 text-center text-[11px] text-slate-500">
+            Complete all missions to claim
+          </div>
+        )}
       </div>
     </div>
 
@@ -70,7 +100,8 @@ const BundleSection: FC<{
       </div>
     )}
   </section>
-);
+  );
+};
 
 const MissionBundles: FC = () => {
   const navigate = useNavigate();
@@ -102,11 +133,14 @@ const MissionBundles: FC = () => {
     return { open: null, openBundle: null };
   }, [bundles, openId]);
 
-  // A bundle's missions can only be claimed once every mission in it is done.
-  const claimLockedReason =
-    openBundle && openBundle.completed < openBundle.total
+  // Claiming is done at the BUNDLE level (one button, all missions at once), so
+  // a mission's own detail panel never offers an individual claim — it points
+  // back to the bundle's Claim button instead.
+  const claimLockedReason = openBundle
+    ? openBundle.completed < openBundle.total
       ? `Complete all ${openBundle.total} missions in this bundle to claim`
-      : null;
+      : 'Use “Claim Bundle Reward” to claim every mission at once'
+    : null;
 
   const act = async (
     fn: () => Promise<{ success: boolean; message: string }>,
@@ -121,6 +155,30 @@ const MissionBundles: FC = () => {
       } else toast.error(r?.message || "Action failed");
     } catch (e) {
       toast.error((e as ApiError)?.message || "Action failed");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  // Claim every completed mission in the bundle in one go.
+  const claimBundle = async (bundle: MissionBundle) => {
+    const pending = bundle.missions.filter((m) => m.status === "COMPLETED");
+    if (pending.length === 0) return;
+    setBusy(true);
+    try {
+      let claimed = 0;
+      for (const m of pending) {
+        const r = await endpoints.missionBundles.claim(m.id);
+        if (r?.success) claimed += 1;
+        else toast.error(r?.message || `Couldn't claim “${m.name}”`);
+      }
+      if (claimed > 0)
+        toast.success(
+          `Claimed ${claimed} reward${claimed === 1 ? "" : "s"} — see your Bonuses!`
+        );
+      await load();
+    } catch (e) {
+      toast.error((e as ApiError)?.message || "Claim failed");
     } finally {
       setBusy(false);
     }
@@ -142,7 +200,9 @@ const MissionBundles: FC = () => {
         <BundleSection
           key={b.id}
           bundle={b}
+          busy={busy}
           onOpenMission={(id) => setOpenId(id)}
+          onClaim={() => claimBundle(b)}
         />
       ))}
 

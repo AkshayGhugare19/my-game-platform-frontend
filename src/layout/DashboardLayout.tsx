@@ -30,6 +30,7 @@ import {
   LineSquiggle,
   TrophyIcon,
   AirplayIcon,
+  LayoutGrid,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useSocket } from "@/context/SocketContext";
@@ -79,6 +80,7 @@ const nav: Array<NavItem | NavGroup> = [
     ],
   },
   { to: "/game-history", label: "Game History", icon: History },
+  { to: "/widgets", label: "Widgets", icon: LayoutGrid },
   { to: "/profile", label: "Profile", icon: User },
 ];
 

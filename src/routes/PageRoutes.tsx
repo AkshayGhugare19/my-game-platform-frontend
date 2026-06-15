@@ -26,6 +26,7 @@ import Snake from "@/pages/games/Snake";
 import TeenPatti from "@/pages/games/TeenPatti";
 import Aviator from "@/pages/games/Aviator";
 import Notifications from "@/pages/Notifications";
+import Widgets from "@/pages/embed/Widgets";
 import NotFound from "@/pages/NotFound";
 
 const PageRoutes: FC = () => (
@@ -63,6 +64,7 @@ const PageRoutes: FC = () => (
         element={<Navigate to="/games/lucky-spinner" replace />}
       />
       <Route path="/game-history" element={<GameHistory />} />
+      <Route path="/widgets" element={<Widgets />} />
       <Route path="/notifications" element={<Notifications />} />
     </Route>
 

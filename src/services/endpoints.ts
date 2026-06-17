@@ -67,7 +67,25 @@ const endpoints = {
     record: async (
       payload: RecordActivityPayload
     ): Promise<ApiResponse<ActivityResult>> => {
-      const res = await apiService.post<ActivityResult>("/activity", payload);
+      // Carry the mission / bundle context (set when a game is launched from a
+      // mission or bundle card, e.g. ?mission=<id>&bundle=<id>) into the
+      // activity meta, so the backend advances ONLY that mission's track and
+      // standalone vs bundle progress stay separate.
+      const ctx = new URLSearchParams(window.location.search);
+      const mission = ctx.get("mission");
+      const bundle = ctx.get("bundle");
+      const withCtx: RecordActivityPayload =
+        mission || bundle
+          ? {
+              ...payload,
+              meta: {
+                ...(payload.meta ?? {}),
+                ...(mission ? { mission } : {}),
+                ...(bundle ? { bundle } : {}),
+              },
+            }
+          : payload;
+      const res = await apiService.post<ActivityResult>("/activity", withCtx);
       // When a game is launched from a tournament (`?tournament=<id>` in the
       // URL), mirror the points earned to that tournament's leaderboard.
       // Best-effort: never let scoring break the play result.

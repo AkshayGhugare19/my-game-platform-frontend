@@ -238,7 +238,13 @@ const MissionBundles: FC = () => {
               "Mission cancelled"
             )
           }
-          onPlay={(key) => navigate(`/games/${key}?mission=${open.id}`)}
+          onPlay={(key) =>
+            navigate(
+              `/games/${key}?mission=${open.id}${
+                openBundle ? `&bundle=${openBundle.id}` : ''
+              }`
+            )
+          }
           claimLockedReason={claimLockedReason}
         />
       )}

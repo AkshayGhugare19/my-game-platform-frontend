@@ -221,6 +221,9 @@ const endpoints = {
       game?: string | null
     ): Promise<ApiResponse<{ tournament_id: string; score: number; applied: number }>> =>
       apiService.post(`/tournaments/${id}/score`, { points, game }),
+    /** Claim a settled tournament prize (GAMRU grants it into the reward ledger). */
+    claim: (id: string): Promise<ApiResponse<{ prize: number }>> =>
+      apiService.post(`/tournaments/${id}/claim`, {}),
   },
 
   /** /api/leaderboard — global / weekly / monthly boards. */

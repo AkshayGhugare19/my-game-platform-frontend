@@ -373,6 +373,8 @@ export interface TournamentLeaderboardEntry {
   is_me: boolean;
   /** Prize-pool share credited to this player once the tournament ended (top-3). */
   prize?: number;
+  /** Whether this player already claimed their prize (server-authoritative). */
+  claimed?: boolean;
 }
 
 export interface TournamentListResult {
@@ -402,5 +404,8 @@ export interface TournamentHistoryEntry {
   games_played: TournamentHistoryGame[];
   xp: number;
   rank: number;
+  /** Prize GAMRU computed for this player, and whether it has been claimed. */
+  prize?: number;
+  claimed?: boolean;
   last_played_at: string | null;
 }

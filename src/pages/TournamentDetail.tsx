@@ -151,6 +151,8 @@ const TournamentDetail: FC = () => {
   const [loading, setLoading] = useState(true);
   const [imgBroken, setImgBroken] = useState(false);
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [claiming, setClaiming] = useState(false);
+  const [claimed, setClaimed] = useState(false);
 
   const load = useCallback(async () => {
     if (!id) return;
@@ -168,6 +170,23 @@ const TournamentDetail: FC = () => {
       setLoading(false);
     }
   }, [id]);
+
+  const claimPrize = useCallback(async () => {
+    if (!id) return;
+    setClaiming(true);
+    try {
+      const r = await endpoints.tournaments.claim(id);
+      if (r?.success) {
+        toast.success(`Prize claimed: $${r.data?.prize ?? ""}`.trim());
+        setClaimed(true);
+        load();
+      } else toast.error(r?.message || "Failed to claim prize");
+    } catch (e) {
+      toast.error((e as ApiError)?.message || "Failed to claim prize");
+    } finally {
+      setClaiming(false);
+    }
+  }, [id, load]);
 
   useEffect(() => {
     load();
@@ -197,6 +216,12 @@ const TournamentDetail: FC = () => {
     : branding.tag_color_casino;
   const canPlay = t.games.length > 0 && t.state !== "ENDED";
   const HeroIcon = t.games.length ? gameMeta(t.games[0]).icon : Trophy;
+  const myEntry = board.find((e) => e.is_me);
+  const myPrize = myEntry?.prize ?? 0;
+  // "claimed" is server-authoritative (GAMRU → games via the leaderboard entry);
+  // `claimed` local state only covers the optimistic gap until the reload lands.
+  const alreadyClaimed = Boolean(myEntry?.claimed) || claimed;
+  const canClaim = t.state === "ENDED" && myPrize > 0 && !alreadyClaimed;
 
   return (
     <DashboardLayout>
@@ -326,6 +351,22 @@ const TournamentDetail: FC = () => {
               {t.state === "ENDED"
                 ? "This tournament has ended."
                 : "No games are configured for this tournament yet."}
+            </div>
+          )}
+
+          {canClaim && (
+            <button
+              onClick={claimPrize}
+              disabled={claiming}
+              className="w-full flex gap-1.5 justify-center items-center py-2 rounded-md bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-900 font-semibold hover:from-amber-400 hover:to-yellow-400 disabled:opacity-60"
+            >
+              <Trophy size={18} />
+              {claiming ? "Claiming…" : `Claim your $${myPrize.toLocaleString()} prize`}
+            </button>
+          )}
+          {t.state === "ENDED" && myPrize > 0 && alreadyClaimed && (
+            <div className="rounded-2xl bg-green-500/10 ring-1 ring-green-500/30 px-4 py-3 text-sm text-green-300 text-center">
+              Prize claimed — it's in your rewards.
             </div>
           )}
 

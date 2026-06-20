@@ -37,7 +37,7 @@ import { useAuth } from "@/context/AuthContext";
 import { useSocket } from "@/context/SocketContext";
 import apiService from "@/services/api";
 
-type BadgeKey = "rewards";
+type BadgeKey = "rewards" | "inbox";
 
 interface NavItem {
   to: string;
@@ -81,7 +81,7 @@ const nav: Array<NavItem | NavGroup> = [
     ],
   },
   { to: "/game-history", label: "Game History", icon: History },
-  { to: "/inbox", label: "Inbox", icon: Mail },
+  { to: "/inbox", label: "Inbox", icon: Mail, badgeKey: "inbox" },
   { to: "/widgets", label: "Widgets", icon: LayoutGrid },
   { to: "/profile", label: "Profile", icon: User },
 ];
@@ -96,6 +96,7 @@ const DashboardLayout: FC<{ children: ReactNode }> = ({ children }) => {
   const location = useLocation();
   const [unread, setUnread] = useState(0);
   const [pendingRewards, setPendingRewards] = useState(0);
+  const [inboxUnread, setInboxUnread] = useState(0);
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>(() => ({
     games: location.pathname.startsWith("/games"),
   }));
@@ -122,12 +123,23 @@ const DashboardLayout: FC<{ children: ReactNode }> = ({ children }) => {
     }
   };
 
+  const loadInboxUnread = async () => {
+    try {
+      const r = await apiService.get<{ count: number }>("/inbox/unread-count");
+      if (r?.success) setInboxUnread(r.data?.count ?? 0);
+    } catch {
+      /* ignore */
+    }
+  };
+
   useEffect(() => {
     loadUnread();
     loadPendingRewards();
+    loadInboxUnread();
     const offNotif = on("notification:new", () => {
       setUnread((n) => n + 1);
       loadPendingRewards();
+      loadInboxUnread();
     });
     const offReward = on("reward:granted", () => {
       loadPendingRewards();
@@ -137,6 +149,13 @@ const DashboardLayout: FC<{ children: ReactNode }> = ({ children }) => {
       offReward();
     };
   }, [on]);
+
+  // Refresh the inbox unread badge on every navigation: there's no realtime
+  // inbox socket event, so re-reading the count as the player moves around
+  // (notably leaving /inbox after reading messages) keeps the badge honest.
+  useEffect(() => {
+    loadInboxUnread();
+  }, [location.pathname]);
 
   // Auto-open a group whenever the route enters it (e.g. external link to
   // /games/dragon-run should leave the Games group expanded on arrival).
@@ -152,8 +171,11 @@ const DashboardLayout: FC<{ children: ReactNode }> = ({ children }) => {
     });
   }, [location.pathname]);
 
-  const badgeFor = (key?: BadgeKey): number | null =>
-    key === "rewards" && pendingRewards > 0 ? pendingRewards : null;
+  const badgeFor = (key?: BadgeKey): number | null => {
+    if (key === "rewards") return pendingRewards > 0 ? pendingRewards : null;
+    if (key === "inbox") return inboxUnread > 0 ? inboxUnread : null;
+    return null;
+  };
 
   const renderLeaf = (item: NavItem, indent = false) => {
     const badge = badgeFor(item.badgeKey);

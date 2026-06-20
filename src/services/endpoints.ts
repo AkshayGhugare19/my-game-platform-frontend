@@ -5,6 +5,8 @@ import type {
   BoosterRow,
   BuyResult,
   GamificationProfile,
+  InboxItem,
+  InboxResponse,
   LeaderboardData,
   Mission,
   MissionListResult,
@@ -248,6 +250,23 @@ const endpoints = {
       }),
     markAllRead: (): Promise<ApiResponse<unknown>> =>
       apiService.patch("/notifications/read-all"),
+  },
+
+  /** /api/inbox — on-site campaign messages delivered by GAMRU. */
+  inbox: {
+    list: (page = 1, limit = 20): Promise<ApiResponse<InboxResponse>> =>
+      apiService.get<InboxResponse>("/inbox", { page, limit }),
+    unreadCount: (): Promise<ApiResponse<{ count: number }>> =>
+      apiService.get<{ count: number }>("/inbox/unread-count"),
+    read: (id: string): Promise<ApiResponse<InboxItem>> =>
+      apiService.patch<InboxItem>(`/inbox/${id}/read`),
+    click: (id: string): Promise<ApiResponse<InboxItem>> =>
+      apiService.patch<InboxItem>(`/inbox/${id}/click`),
+    unsubscribe: (
+      channel = "ON_SITE",
+      reason?: string
+    ): Promise<ApiResponse<unknown>> =>
+      apiService.post("/inbox/unsubscribe", { channel, reason }),
   },
 };
 

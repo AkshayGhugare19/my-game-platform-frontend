@@ -230,6 +230,31 @@ export interface NotificationItem {
   created_at: string;
 }
 
+/** One on-site campaign message delivered by GAMRU (the inbox). */
+export interface InboxItem {
+  id: string;
+  campaign_id: string | null;
+  channel: string;
+  title: string;
+  body: string;
+  status: string;
+  read: boolean;
+  event_label: string | null;
+  event_at: string;
+  read_at: string | null;
+}
+
+export interface InboxResponse {
+  unread_count: number;
+  items: InboxItem[];
+  pagination: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
 /** Mirrors the backend `recordActivity` return shape. */
 export interface ActivityResult {
   duplicate: boolean;

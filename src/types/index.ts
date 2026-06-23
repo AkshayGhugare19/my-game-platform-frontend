@@ -27,6 +27,7 @@ export interface AuthUser {
   first_name: string;
   last_name: string;
   email: string;
+  role?: string;
 }
 
 export interface LoginResponseData {
@@ -204,6 +205,23 @@ export interface UserReward {
   reward?: string | null;
   is_manual?: boolean;
   created_at?: string;
+  /** Set on locally-granted bonus rows so the claim routes to /bonuses/:id/claim. */
+  is_bonus?: boolean;
+  amount?: number;
+  amount_type?: "RM" | "BM";
+}
+
+/** A bonus definition in the games-platform catalog (admin Bonus Management). */
+export interface Bonus {
+  id: string;
+  bonusName: string;
+  bonusType: string;
+  amount: number;
+  amountType: "RM" | "BM";
+  status: "ACTIVE" | "INACTIVE";
+  description: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface LeaderboardRow {
@@ -271,6 +289,10 @@ export interface ActivityResult {
 /** The player's money wallet, as returned by /api/wallet. */
 export interface Wallet {
   balance: number;
+  /** Real Money — deposits + RM-typed bonus claims (balance = realMoney + bonusMoney). */
+  realMoney: number;
+  /** Bonus Money — BM-typed bonus claims. */
+  bonusMoney: number;
   currency: string;
   depositCount: number;
   totalDeposit: number;

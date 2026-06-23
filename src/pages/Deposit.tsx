@@ -75,6 +75,20 @@ const Deposit: FC = () => {
                 </div>
               </div>
             </div>
+            <div className="grid grid-cols-2 gap-3 text-sm mb-3">
+              <div className="rounded-lg bg-slate-800 p-3">
+                <div className="text-slate-400">Real Money</div>
+                <div className="text-lg font-semibold text-emerald-400">
+                  {currency} {(wallet?.realMoney ?? 0).toFixed(2)}
+                </div>
+              </div>
+              <div className="rounded-lg bg-slate-800 p-3">
+                <div className="text-slate-400">Bonus Money</div>
+                <div className="text-lg font-semibold text-amber-400">
+                  {currency} {(wallet?.bonusMoney ?? 0).toFixed(2)}
+                </div>
+              </div>
+            </div>
             <div className="grid grid-cols-2 gap-3 text-sm">
               <div className="rounded-lg bg-slate-800 p-3">
                 <div className="text-slate-400">Deposits</div>

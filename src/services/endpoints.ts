@@ -2,6 +2,7 @@ import apiService from "@/services/api";
 import type {
   ActivityResult,
   ApiResponse,
+  Bonus,
   BoosterRow,
   BuyResult,
   GamificationProfile,
@@ -157,6 +158,30 @@ const endpoints = {
       }),
     claim: (id: string): Promise<ApiResponse<unknown>> =>
       apiService.post(`/rewards/${id}/claim`),
+  },
+
+  /**
+   * /api/bonuses — bonus catalog (admin CRUD) + the player's granted bonuses.
+   * Admin pastes a bonus `id` into a GAMRU rank/level so reaching it grants it.
+   */
+  bonuses: {
+    // Admin — bonus catalog management.
+    list: (
+      page = 1,
+      limit = 10
+    ): Promise<ApiResponse<PaginatedData<Bonus>>> =>
+      apiService.get<PaginatedData<Bonus>>("/bonuses", { page, limit }),
+    create: (data: Partial<Bonus>): Promise<ApiResponse<Bonus>> =>
+      apiService.post<Bonus>("/bonuses", data),
+    update: (id: string, data: Partial<Bonus>): Promise<ApiResponse<Bonus>> =>
+      apiService.put<Bonus>(`/bonuses/${id}`, data),
+    remove: (id: string): Promise<ApiResponse<unknown>> =>
+      apiService.delete(`/bonuses/${id}`),
+    // Player — granted bonuses (also merged into /rewards) + claim.
+    mine: (): Promise<ApiResponse<UserReward[]>> =>
+      apiService.get<UserReward[]>("/bonuses/me"),
+    claim: (id: string): Promise<ApiResponse<unknown>> =>
+      apiService.post(`/bonuses/${id}/claim`),
   },
 
   /**

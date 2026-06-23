@@ -28,11 +28,16 @@ const Rewards: FC = () => {
     load();
   }, [load]);
 
-  const handleClaim = async (id: string) => {
+  const handleClaim = async (row: UserReward) => {
+    const id = row.id;
     if (claiming) return;
     setClaiming(id);
     try {
-      const r = await endpoints.rewards.claim(id);
+      // Locally-granted bonuses claim through /bonuses/:id/claim (credits the
+      // RM/BM wallet); GAMRU-sourced rewards claim through /rewards/:id/claim.
+      const r = row.is_bonus
+        ? await endpoints.bonuses.claim(id)
+        : await endpoints.rewards.claim(id);
       if (r?.success) {
         toast.success(r.message || "Reward claimed");
         await load();
@@ -89,7 +94,7 @@ const Rewards: FC = () => {
                   <td className="p-3 text-right">
                     {isPending ? (
                       <button
-                        onClick={() => handleClaim(r.id)}
+                        onClick={() => handleClaim(r)}
                         disabled={claiming === r.id}
                         className="btn-primary text-xs px-3 py-1.5"
                       >

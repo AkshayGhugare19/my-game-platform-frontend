@@ -32,6 +32,7 @@ import {
   AirplayIcon,
   LayoutGrid,
   Mail,
+  BadgeDollarSign,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useSocket } from "@/context/SocketContext";
@@ -44,6 +45,7 @@ interface NavItem {
   label: string;
   icon: LucideIcon;
   badgeKey?: BadgeKey;
+  adminOnly?: boolean;
 }
 
 interface NavGroup {
@@ -84,6 +86,12 @@ const nav: Array<NavItem | NavGroup> = [
   { to: "/inbox", label: "Inbox", icon: Mail, badgeKey: "inbox" },
   { to: "/widgets", label: "Widgets", icon: LayoutGrid },
   { to: "/profile", label: "Profile", icon: User },
+  {
+    to: "/admin/bonuses",
+    label: "Bonus Management",
+    icon: BadgeDollarSign,
+    adminOnly: true,
+  },
 ];
 
 const isGroup = (item: NavItem | NavGroup): item is NavGroup =>
@@ -251,9 +259,14 @@ const DashboardLayout: FC<{ children: ReactNode }> = ({ children }) => {
           </span>
         </div>
         <nav className="flex-1 min-h-0 px-3 space-y-1 overflow-y-auto">
-          {nav.map((item) =>
-            isGroup(item) ? renderGroup(item) : renderLeaf(item)
-          )}
+          {nav
+            .filter(
+              (item) =>
+                isGroup(item) || !item.adminOnly || user?.role === "ADMIN"
+            )
+            .map((item) =>
+              isGroup(item) ? renderGroup(item) : renderLeaf(item)
+            )}
         </nav>
         <button
           onClick={() => {

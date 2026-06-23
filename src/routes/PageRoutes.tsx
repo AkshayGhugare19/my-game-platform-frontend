@@ -2,6 +2,7 @@ import type { FC } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import PublicRoute from "./PublicRoute";
 import ProtectedRoute from "./ProtectedRoute";
+import AdminRoute from "./AdminRoute";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import Dashboard from "@/pages/Dashboard";
@@ -27,6 +28,7 @@ import TeenPatti from "@/pages/games/TeenPatti";
 import Aviator from "@/pages/games/Aviator";
 import Notifications from "@/pages/Notifications";
 import Inbox from "@/pages/Inbox";
+import AdminBonuses from "@/pages/admin/Bonuses";
 import Widgets from "@/pages/embed/Widgets";
 import NotFound from "@/pages/NotFound";
 
@@ -68,6 +70,10 @@ const PageRoutes: FC = () => (
       <Route path="/widgets" element={<Widgets />} />
       <Route path="/notifications" element={<Notifications />} />
       <Route path="/inbox" element={<Inbox />} />
+    </Route>
+
+    <Route element={<AdminRoute />}>
+      <Route path="/admin/bonuses" element={<AdminBonuses />} />
     </Route>
 
     <Route path="*" element={<NotFound />} />

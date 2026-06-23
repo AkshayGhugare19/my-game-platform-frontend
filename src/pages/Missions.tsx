@@ -10,12 +10,12 @@ const Hero: FC<{ branding: MissionBranding }> = ({ branding }) => (
   <div className="relative mb-6 overflow-hidden rounded-3xl border border-white/10 shadow-2xl">
     {branding.banner_desktop ?
     <img
-      src="https://i.ibb.co/XrHPnbfK/Screenshot-2026-06-06-134320.png"
+      src="https://t4.ftcdn.net/jpg/16/87/35/37/240_F_1687353797_OEyUK36TToKTnEkBI76RoDVm9I8CsF9p.jpg"
       alt="Missions"
       className="absolute inset-0 h-full w-full object-cover scale-105 animate-[pulse_8s_ease-in-out_infinite]"
     /> :
     <img
-      src="https://i.ibb.co/XrHPnbfK/Screenshot-2026-06-06-134320.png"
+      src="https://t4.ftcdn.net/jpg/16/87/35/37/240_F_1687353797_OEyUK36TToKTnEkBI76RoDVm9I8CsF9p.jpg"
       alt="Missions"
       className="absolute inset-0 h-full w-full object-cover scale-105 animate-[pulse_8s_ease-in-out_infinite]"
     />

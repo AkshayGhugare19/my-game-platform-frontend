@@ -34,6 +34,7 @@ const INLINE = new Set(["avatar", "tokens", "badge-level", "points", "gamificati
 
 const META: Record<string, { label: string; emoji: string }> = {
   mission: { label: "Missions", emoji: "🎯" },
+  "mission-bundle": { label: "Mission Bundles", emoji: "🧩" },
   tournament: { label: "Tournaments", emoji: "⚔️" },
   "reward-shop": { label: "Reward Shop", emoji: "🛍️" },
   rewards: { label: "Rewards", emoji: "🎁" },
@@ -107,6 +108,10 @@ const Widgets: FC = () => {
     if (CLIENT_ID) s.dataset.clientId = CLIENT_ID;
     s.dataset.authKey = AUTH_KEY;
     if (user?.email) s.dataset.email = user.email;
+    // NOTE: the user frontend stays a pure renderer — it passes only
+    // email/authKey/clientId. Where the games live (for in-widget play) is
+    // GAMRU-side config (VITE_GAMES_PLATFORM_BASE on the widget build, or a
+    // per-script data-games-base override); the SDK owns all game/mission logic.
     s.onload = () => setSdkReady(true);
     document.body.appendChild(s);
   }, [user?.email]);

@@ -1,5 +1,6 @@
 import axios, { AxiosRequestConfig, type AxiosInstance } from "axios";
 import type { ApiResponse } from "@/types";
+import { isWidgetEmbed } from "@/utils/embed";
 
 const api: AxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:5001/api",
@@ -49,6 +50,15 @@ api.interceptors.response.use(
   (res) => res.data,
   async (error) => {
     const original = error.config;
+    // In a GAMRU widget iframe there is no games-platform session — a 401 is
+    // expected (e.g. a game's profile fetch). Never refresh or clear here: the
+    // embedded game shares this origin's sessionStorage with the top games tab,
+    // so clearing it would log the real user out. Just reject.
+    if (isWidgetEmbed()) {
+      return Promise.reject(
+        error.response?.data ?? { message: "Something went wrong" }
+      );
+    }
     if (error.response?.status === 401 && !original?._retry) {
       original._retry = true;
       refreshing = refreshing ?? tryRefresh();

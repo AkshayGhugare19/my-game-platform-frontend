@@ -37,6 +37,11 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { useSocket } from "@/context/SocketContext";
 import apiService from "@/services/api";
+import { isWidgetEmbed } from "@/utils/embed";
+
+// When a game is loaded inside a GAMRU widget iframe (?embed=widget), strip all
+// app chrome (sidebar / header / badge fetches) and render only the game.
+const EMBED = isWidgetEmbed();
 
 type BadgeKey = "rewards" | "inbox";
 
@@ -97,7 +102,7 @@ const nav: Array<NavItem | NavGroup> = [
 const isGroup = (item: NavItem | NavGroup): item is NavGroup =>
   (item as NavGroup).children !== undefined;
 
-const DashboardLayout: FC<{ children: ReactNode }> = ({ children }) => {
+const DashboardLayoutFull: FC<{ children: ReactNode }> = ({ children }) => {
   const { user, logout } = useAuth();
   const { on } = useSocket();
   const navigate = useNavigate();
@@ -306,5 +311,17 @@ const DashboardLayout: FC<{ children: ReactNode }> = ({ children }) => {
     </div>
   );
 };
+
+/**
+ * In widget-embed mode render only the game (bare), so a game nested inside a
+ * GAMRU widget iframe shows no games-platform chrome. Otherwise the full shell.
+ * Kept as a wrapper (no hooks) so `DashboardLayoutFull`'s hooks always run.
+ */
+const DashboardLayout: FC<{ children: ReactNode }> = ({ children }) =>
+  EMBED ? (
+    <div className="min-h-screen bg-slate-950 text-white">{children}</div>
+  ) : (
+    <DashboardLayoutFull>{children}</DashboardLayoutFull>
+  );
 
 export default DashboardLayout;

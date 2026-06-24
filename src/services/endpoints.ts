@@ -1,4 +1,5 @@
 import apiService from "@/services/api";
+import { isWidgetEmbed, postPlayToParent } from "@/utils/embed";
 import type {
   ActivityResult,
   ApiResponse,
@@ -77,6 +78,39 @@ const endpoints = {
       const ctx = new URLSearchParams(window.location.search);
       const mission = ctx.get("mission");
       const bundle = ctx.get("bundle");
+      // Widget-embed mode: there is NO games-platform session here. Instead of
+      // posting to the games backend, report the play to the parent GAMRU
+      // widget, which relays it to GAMRU's clientAuth API (the "Widget APIs").
+      // Same game logic, different API source.
+      if (isWidgetEmbed()) {
+        const m = (payload.meta ?? {}) as Record<string, unknown>;
+        const num = (v: unknown): number =>
+          typeof v === "number" && Number.isFinite(v) ? v : 0;
+        postPlayToParent({
+          kind: "play",
+          gameKey:
+            (typeof m.game === "string" ? m.game : null) ?? payload.gameId ?? null,
+          stake: num(m.bet),
+          win: Boolean(m.win),
+          winAmount: num(m.winAmount) || num(payload.amount),
+          amount: num(payload.amount),
+          points: num(payload.amount),
+          mission,
+          bundle,
+          tournament: ctx.get("tournament"),
+        });
+        return {
+          success: true,
+          message: "Play reported to widget",
+          data: {
+            duplicate: false,
+            xpAwarded: 0,
+            breakdown: { base: 0, streakBonus: 0, dailyBonus: 0 },
+            xpTotal: 0,
+            gamru: null,
+          },
+        } as ApiResponse<ActivityResult>;
+      }
       const withCtx: RecordActivityPayload =
         mission || bundle
           ? {

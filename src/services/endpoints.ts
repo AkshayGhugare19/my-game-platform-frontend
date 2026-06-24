@@ -86,26 +86,30 @@ const endpoints = {
         const m = (payload.meta ?? {}) as Record<string, unknown>;
         const num = (v: unknown): number =>
           typeof v === "number" && Number.isFinite(v) ? v : 0;
+        const xp = num(payload.amount);
         postPlayToParent({
           kind: "play",
           gameKey:
             (typeof m.game === "string" ? m.game : null) ?? payload.gameId ?? null,
           stake: num(m.bet),
           win: Boolean(m.win),
-          winAmount: num(m.winAmount) || num(payload.amount),
-          amount: num(payload.amount),
-          points: num(payload.amount),
+          winAmount: num(m.winAmount) || xp,
+          amount: xp,
+          points: xp,
           mission,
           bundle,
           tournament: ctx.get("tournament"),
         });
+        // Report the XP this play earns so the in-game toast is accurate — it is
+        // exactly what the parent widget credits via GAMRU add-xp (no games
+        // backend here to apply booster/streak/daily multipliers).
         return {
           success: true,
           message: "Play reported to widget",
           data: {
             duplicate: false,
-            xpAwarded: 0,
-            breakdown: { base: 0, streakBonus: 0, dailyBonus: 0 },
+            xpAwarded: xp,
+            breakdown: { base: xp, streakBonus: 0, dailyBonus: 0 },
             xpTotal: 0,
             gamru: null,
           },

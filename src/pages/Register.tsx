@@ -86,8 +86,8 @@ const Register: FC = () => {
         <p className="text-sm text-slate-400">
           You'll be auto-onboarded into the gamification platform.
         </p>
-        {field("first_name", "First name")}
-        {field("last_name", "Last name")}
+        {field("first_name", "First name (optional)")}
+        {field("last_name", "Last name (optional)")}
         {field("email", "Email")}
         {field("mobile", "Mobile (10–15 digits)")}
         {field("password", "Password", "password")}

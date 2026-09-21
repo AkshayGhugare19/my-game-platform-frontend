@@ -9,8 +9,11 @@ import Dashboard from "@/pages/Dashboard";
 import Profile from "@/pages/Profile";
 import Missions from "@/pages/Missions";
 import MissionBundles from "@/pages/MissionBundles";
+import Challenges from "@/pages/Challenges";
 import Tournaments from "@/pages/Tournaments";
 import TournamentDetail from "@/pages/TournamentDetail";
+import Races from "@/pages/Races";
+import RaceDetail from "@/pages/RaceDetail";
 import Rewards from "@/pages/Rewards";
 import RewardShop from "@/pages/RewardShop";
 import Deposit from "@/pages/Deposit";
@@ -45,8 +48,11 @@ const PageRoutes: FC = () => (
       <Route path="/profile" element={<Profile />} />
       <Route path="/missions" element={<Missions />} />
       <Route path="/mission-bundles" element={<MissionBundles />} />
+      <Route path="/challenges" element={<Challenges />} />
       <Route path="/tournaments" element={<Tournaments />} />
       <Route path="/tournaments/:id" element={<TournamentDetail />} />
+      <Route path="/races" element={<Races />} />
+      <Route path="/races/:id" element={<RaceDetail />} />
       <Route path="/rewards" element={<Rewards />} />
       <Route path="/reward-shop" element={<RewardShop />} />
       <Route path="/deposit" element={<Deposit />} />

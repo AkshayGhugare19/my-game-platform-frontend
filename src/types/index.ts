@@ -456,3 +456,86 @@ export interface TournamentHistoryEntry {
   claimed?: boolean;
   last_played_at: string | null;
 }
+
+// ─── Challenges (sourced from Gamru) ────────────────────────────────────────
+
+/**
+ * A challenge as authored in Gamru and served by /api/challenges. The
+ * player's participation (status + progress) is merged in by the games
+ * backend — same pattern as missions.
+ */
+export type ChallengeStatus =
+  | "AVAILABLE"
+  | "IN_PROGRESS"
+  | "COMPLETED"
+  | "CLAIMED";
+
+export interface Challenge {
+  id: string;
+  name: string;
+  description: string | null;
+  category: string; // Slots / Originals / Sport / provider name
+  provider: string | null;
+  banner_image: string | null;
+  status: ChallengeStatus;
+  condition_label: string; // e.g. "Hit 1,000x multiplier"
+  target: number;
+  progress: number;
+  min_bet: number | null;
+  eligible_currencies: string[];
+  games: string[];
+  start_date: string | null;
+  end_date: string | null;
+  reward_type: string;
+  reward_amount: number;
+  reward_label: string; // e.g. "50 Bonus Bets x $2"
+  tags: string[];
+}
+
+// ─── Races (sourced from Gamru) ─────────────────────────────────────────────
+
+export type RaceState = "SCHEDULED" | "IN_PROGRESS" | "ENDED";
+
+export interface Race {
+  id: string;
+  name: string;
+  description: string | null;
+  category: string;
+  race_type: string | null;
+  games: string[];
+  banner_image: string | null;
+  min_bet: number | null;
+  start_date: string | null;
+  end_date: string | null;
+  prize_pool: number | null;
+  eligible_players: string | null;
+  segment: string | null;
+  tags: string[];
+  state: RaceState;
+  /** Whether the current player has already joined this race. */
+  registered: boolean;
+}
+
+export interface RaceBranding {
+  banner_desktop: string | null;
+  banner_mobile: string | null;
+  tag_color_casino: string;
+  tag_color_sport: string;
+}
+
+export interface RaceLeaderboardEntry {
+  rank: number;
+  email: string;
+  name: string;
+  score: number;
+  is_me: boolean;
+  /** Prize-pool share credited to this player once the race ended (top-3). */
+  prize?: number;
+  /** Whether this player already claimed their prize (server-authoritative). */
+  claimed?: boolean;
+}
+
+export interface RaceDetailResult {
+  race: Race;
+  leaderboard: RaceLeaderboardEntry[];
+}

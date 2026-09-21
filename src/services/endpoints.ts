@@ -6,6 +6,7 @@ import type {
   Bonus,
   BoosterRow,
   BuyResult,
+  Challenge,
   GamificationProfile,
   InboxItem,
   InboxResponse,
@@ -16,6 +17,9 @@ import type {
   MissionBundleListResult,
   NotificationItem,
   PaginatedData,
+  Race,
+  RaceDetailResult,
+  RaceLeaderboardEntry,
   RecordActivityPayload,
   RewardPurchaseRow,
   RewardShopCatalog,
@@ -78,6 +82,12 @@ const endpoints = {
       const ctx = new URLSearchParams(window.location.search);
       const mission = ctx.get("mission");
       const bundle = ctx.get("bundle");
+      // Same context-carrying for Challenges/Races (?challenge=<id> /
+      // ?race=<id>, set by ChallengeDetails'/RaceCard's "Play" button) — the
+      // backend reads these as TOP-LEVEL fields (challengeId/raceId), not
+      // nested in meta like mission/bundle.
+      const challengeId = ctx.get("challenge") ?? undefined;
+      const raceId = ctx.get("race") ?? undefined;
       // Widget-embed mode: there is NO games-platform session here. Instead of
       // posting to the games backend, report the play to the parent GAMRU
       // widget, which relays it to GAMRU's clientAuth API (the "Widget APIs").
@@ -115,17 +125,22 @@ const endpoints = {
           },
         } as ApiResponse<ActivityResult>;
       }
-      const withCtx: RecordActivityPayload =
-        mission || bundle
-          ? {
-              ...payload,
-              meta: {
-                ...(payload.meta ?? {}),
-                ...(mission ? { mission } : {}),
-                ...(bundle ? { bundle } : {}),
-              },
-            }
-          : payload;
+      const withCtx: RecordActivityPayload &
+        Record<string, unknown> = {
+        ...payload,
+        meta: {
+          ...(payload.meta ?? {}),
+          ...(mission ? { mission } : {}),
+          ...(bundle ? { bundle } : {}),
+        },
+        ...(challengeId ? { challengeId } : {}),
+        ...(raceId ? { raceId } : {}),
+        // This platform has no multi-currency wallet yet (Wallet.currency is
+        // effectively always "USD") — send it so Challenges/Races configured
+        // with an eligible_currencies restriction can actually match a play,
+        // instead of every play being silently rejected by that check.
+        currency: (payload.meta?.currency as string | undefined) ?? "USD",
+      };
       const res = await apiService.post<ActivityResult>("/activity", withCtx);
       // When a game is launched from a tournament (`?tournament=<id>` in the
       // URL), mirror the points earned to that tournament's leaderboard.
@@ -241,6 +256,27 @@ const endpoints = {
   },
 
   /**
+   * /api/challenges — Gamru-authored challenges the player can join, progress
+   * and claim. The catalog is fetched live from gamru with the player's
+   * participation merged in.
+   */
+  challenges: {
+    list: (): Promise<ApiResponse<Challenge[]>> =>
+      apiService.get<Challenge[]>("/challenges"),
+    get: (id: string): Promise<ApiResponse<Challenge>> =>
+      apiService.get<Challenge>(`/challenges/${id}`),
+    join: (id: string): Promise<ApiResponse<Challenge>> =>
+      apiService.post<Challenge>(`/challenges/${id}/join`),
+    /** Standalone progress read (the same progress is also merged into list()/get()). */
+    progress: (id: string): Promise<ApiResponse<Challenge>> =>
+      apiService.get<Challenge>(`/challenges/${id}/progress`),
+    claim: (id: string): Promise<ApiResponse<{ reward_label: string }>> =>
+      apiService.post(`/challenges/${id}/claim`),
+    cancel: (id: string): Promise<ApiResponse<unknown>> =>
+      apiService.post(`/challenges/${id}/cancel`),
+  },
+
+  /**
    * /api/mission-bundles — Gamru-authored bundles that GROUP missions. Read
    * only: each bundle's grouped missions are joined/claimed through the
    * /missions endpoints above.
@@ -289,6 +325,33 @@ const endpoints = {
     /** Claim a settled tournament prize (GAMRU grants it into the reward ledger). */
     claim: (id: string): Promise<ApiResponse<{ prize: number }>> =>
       apiService.post(`/tournaments/${id}/claim`, {}),
+  },
+
+  /**
+   * /api/races — Gamru-authored races the player can join and climb the
+   * leaderboard on. The catalog is fetched live from gamru with the player's
+   * participation merged in.
+   */
+  races: {
+    list: (): Promise<ApiResponse<Race[]>> => apiService.get<Race[]>("/races"),
+    get: (id: string): Promise<ApiResponse<RaceDetailResult>> =>
+      apiService.get<RaceDetailResult>(`/races/${id}`),
+    join: (id: string): Promise<ApiResponse<Race>> =>
+      apiService.post<Race>(`/races/${id}/join`),
+    /** Standalone progress read (the same progress is also merged into get()'s leaderboard). */
+    progress: (id: string): Promise<ApiResponse<unknown>> =>
+      apiService.get(`/races/${id}/progress`),
+    leaderboard: (id: string): Promise<ApiResponse<RaceLeaderboardEntry[]>> =>
+      apiService.get<RaceLeaderboardEntry[]>(`/races/${id}/leaderboard`),
+    score: (
+      id: string,
+      points: number,
+      game?: string | null
+    ): Promise<ApiResponse<{ race_id: string; score: number; applied: number }>> =>
+      apiService.post(`/races/${id}/score`, { points, game }),
+    /** Claim a settled race prize (GAMRU grants it into the reward ledger). */
+    claim: (id: string): Promise<ApiResponse<{ prize: number }>> =>
+      apiService.post(`/races/${id}/claim`, {}),
   },
 
   /** /api/leaderboard — global / weekly / monthly boards. */

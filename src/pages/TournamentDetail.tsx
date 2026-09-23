@@ -48,6 +48,15 @@ const STATE_META: Record<
 
 const isSport = (industry: string) => /sport/i.test(industry);
 
+/** Prize amounts aren't always dollars — render per the tournament's configured Reward Type. */
+const formatPrize = (amount: number, rewardType?: string): string => {
+  const n = amount.toLocaleString();
+  if (rewardType === "free_spins") return `${n} Free Spins`;
+  if (rewardType === "tokens") return `${n} Tokens`;
+  if (rewardType === "xp") return `${n} XP`;
+  return `$${n}`; // real_cash / bonus_cash / unset
+};
+
 const TERMS = [
   ["Eligibility", "Participants must be at least 21 years old and provide valid identification."],
   ["Format", "The tournament runs for a predetermined duration. Players compete using the configured games and bet limits."],
@@ -131,7 +140,7 @@ const LeaderboardList: FC<{ board: TournamentLeaderboardEntry[] }> = ({
               </span>
               {e.prize ? (
                 <span className="text-[11px] font-bold text-emerald-400">
-                  +${e.prize.toLocaleString()}
+                  +{formatPrize(e.prize, e.reward_type)}
                 </span>
               ) : null}
             </span>
@@ -177,7 +186,7 @@ const TournamentDetail: FC = () => {
     try {
       const r = await endpoints.tournaments.claim(id);
       if (r?.success) {
-        toast.success(`Prize claimed: $${r.data?.prize ?? ""}`.trim());
+        toast.success(`Prize claimed: ${formatPrize(r.data?.prize ?? 0, r.data?.reward_type)}`);
         setClaimed(true);
         load();
       } else toast.error(r?.message || "Failed to claim prize");
@@ -361,7 +370,7 @@ const TournamentDetail: FC = () => {
               className="w-full flex gap-1.5 justify-center items-center py-2 rounded-md bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-900 font-semibold hover:from-amber-400 hover:to-yellow-400 disabled:opacity-60"
             >
               <Trophy size={18} />
-              {claiming ? "Claiming…" : `Claim your $${myPrize.toLocaleString()} prize`}
+              {claiming ? "Claiming…" : `Claim your ${formatPrize(myPrize, myEntry?.reward_type)} prize`}
             </button>
           )}
           {t.state === "ENDED" && myPrize > 0 && alreadyClaimed && (
@@ -389,7 +398,7 @@ const TournamentDetail: FC = () => {
               <div className="rounded-xl bg-slate-800/50 ring-1 ring-white/5 px-3 py-2">
                 <div className="text-[11px] text-slate-400">Prize Pool</div>
                 <div className="text-sm font-semibold text-slate-100">
-                  ${t.prize_pool}
+                  {formatPrize(t.prize_pool, t.reward_type)}
                 </div>
               </div>
             )}
@@ -406,6 +415,14 @@ const TournamentDetail: FC = () => {
                 <div className="text-[11px] text-slate-400">Type</div>
                 <div className="text-sm font-semibold text-slate-100">
                   {t.tournament_type}
+                </div>
+              </div>
+            )}
+            {t.reward_type && (
+              <div className="rounded-xl bg-slate-800/50 ring-1 ring-white/5 px-3 py-2">
+                <div className="text-[11px] text-slate-400">Reward Type</div>
+                <div className="text-sm font-semibold text-slate-100">
+                  {t.reward_type}
                 </div>
               </div>
             )}

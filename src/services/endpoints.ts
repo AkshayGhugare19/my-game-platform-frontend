@@ -323,7 +323,7 @@ const endpoints = {
     ): Promise<ApiResponse<{ tournament_id: string; score: number; applied: number }>> =>
       apiService.post(`/tournaments/${id}/score`, { points, game }),
     /** Claim a settled tournament prize (GAMRU grants it into the reward ledger). */
-    claim: (id: string): Promise<ApiResponse<{ prize: number }>> =>
+    claim: (id: string): Promise<ApiResponse<{ prize: number; reward_type: string }>> =>
       apiService.post(`/tournaments/${id}/claim`, {}),
   },
 
@@ -350,7 +350,7 @@ const endpoints = {
     ): Promise<ApiResponse<{ race_id: string; score: number; applied: number }>> =>
       apiService.post(`/races/${id}/score`, { points, game }),
     /** Claim a settled race prize (GAMRU grants it into the reward ledger). */
-    claim: (id: string): Promise<ApiResponse<{ prize: number }>> =>
+    claim: (id: string): Promise<ApiResponse<{ prize: number; reward_type: string }>> =>
       apiService.post(`/races/${id}/claim`, {}),
   },
 

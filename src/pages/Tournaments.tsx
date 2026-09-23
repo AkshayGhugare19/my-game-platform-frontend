@@ -90,7 +90,7 @@ const StatChip: FC<{ icon: React.ReactNode; value: string; label: string }> = ({
 }) => (
   <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-slate-800/70 ">
     <span className="text-violet-300 shrink-0">{icon}</span>
-    <div className="flex items-center gap-1">
+    <div className="flex items-center gap-2">
       <div className="text-sm font-bold text-slate-100">{value}</div>
       <div className="text-[10px] uppercase tracking-wide text-slate-400">
         {label}
@@ -147,10 +147,13 @@ const TournamentCard: FC<{
       <div className="py-2 border-t border-white/5">
         <div className="px-4 py-4 flex gap-2 flex-wrap items-center gap-x-3 gap-y-2.5 ">
         {t.max_bets != null && (
-          <StatChip icon={<RefreshCw size={15} />} value={String(t.max_bets)} label="Spins" />
+          <StatChip icon={<RefreshCw size={15} />} value={String(t.max_bets)} label="Bets" />
         )}
         {t.min_bet != null && (
           <StatChip icon={<Coins size={15} />} value={`$${t.min_bet}`} label="Min Bet" />
+        )}
+        {t.prize_pool != null && (
+          <StatChip icon={<Coins size={15} />} value={`${t.prize_pool}`} label={`${t?.reward_type}`} />
         )}
         {t.eligibility_type && (
           <StatChip icon={<Shield size={15} />} value={t.eligibility_type} label="Eligibility" />

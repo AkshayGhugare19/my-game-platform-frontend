@@ -411,6 +411,10 @@ export interface Tournament {
   segment: string | null;
   tags: string[];
   state: TournamentState;
+  /** What a winner's Prize Pool share actually is, credited on claim (defaults to "bonus_cash"). */
+  reward_type: string;
+  /** Only meaningful when reward_type is "free_spins" — which game the spins apply to. */
+  reward_game: string | null;
 }
 
 export interface TournamentBranding {
@@ -430,6 +434,8 @@ export interface TournamentLeaderboardEntry {
   prize?: number;
   /** Whether this player already claimed their prize (server-authoritative). */
   claimed?: boolean;
+  /** The tournament's configured reward type (e.g. "bonus_cash", "free_spins") — same for every row. */
+  reward_type?: string;
 }
 
 export interface TournamentListResult {
@@ -463,6 +469,7 @@ export interface TournamentHistoryEntry {
   prize?: number;
   claimed?: boolean;
   last_played_at: string | null;
+  reward_type?: string;
 }
 
 // ─── Challenges (sourced from Gamru) ────────────────────────────────────────
@@ -522,6 +529,10 @@ export interface Race {
   state: RaceState;
   /** Whether the current player has already joined this race. */
   registered: boolean;
+  /** What a winner's prize share actually is, credited on claim (defaults to "bonus_cash"). */
+  reward_type: string;
+  /** Only meaningful when reward_type is "free_spins" — which game the spins apply to. */
+  reward_game: string | null;
 }
 
 export interface RaceBranding {
@@ -541,6 +552,8 @@ export interface RaceLeaderboardEntry {
   prize?: number;
   /** Whether this player already claimed their prize (server-authoritative). */
   claimed?: boolean;
+  /** The race's configured reward type (e.g. "bonus_cash", "free_spins") — same for every row. */
+  reward_type?: string;
 }
 
 export interface RaceDetailResult {

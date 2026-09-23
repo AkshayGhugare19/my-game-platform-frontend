@@ -286,6 +286,12 @@ export interface ActivityResult {
   gamru: Record<string, unknown> | null;
 }
 
+/** Free spins credited on one game (e.g. from a reward-shop purchase). */
+export interface WalletFreeSpins {
+  gameKey: string;
+  remaining: number;
+}
+
 /** The player's money wallet, as returned by /api/wallet. */
 export interface Wallet {
   balance: number;
@@ -296,6 +302,8 @@ export interface Wallet {
   currency: string;
   depositCount: number;
   totalDeposit: number;
+  /** Free spins credited by a reward-shop purchase, grouped by game. */
+  freeSpins: WalletFreeSpins[];
 }
 
 export interface RecordActivityPayload {

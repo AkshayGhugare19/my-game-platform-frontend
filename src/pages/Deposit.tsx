@@ -1,6 +1,6 @@
 import { useEffect, useState, type FC, type FormEvent } from "react";
 import { toast } from "react-toastify";
-import { Wallet as WalletIcon } from "lucide-react";
+import { Wallet as WalletIcon, Sparkles } from "lucide-react";
 import DashboardLayout from "@/layout/DashboardLayout";
 import endpoints from "@/services/endpoints";
 import type { Wallet } from "@/types";
@@ -103,6 +103,25 @@ const Deposit: FC = () => {
                 </div>
               </div>
             </div>
+
+            {(wallet?.freeSpins?.length ?? 0) > 0 && (
+              <div className="mt-3 rounded-lg bg-slate-800 p-3">
+                <div className="flex items-center gap-2 text-slate-400 mb-2">
+                  <Sparkles className="h-4 w-4 text-fuchsia-400" />
+                  Free Spins
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {wallet!.freeSpins.map((fs) => (
+                    <div key={fs.gameKey} className="flex items-center justify-between">
+                      <span className="capitalize text-slate-300">
+                        {fs.gameKey.replace(/-/g, " ")}
+                      </span>
+                      <span className="font-semibold text-fuchsia-400">{fs.remaining}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Deposit form */}

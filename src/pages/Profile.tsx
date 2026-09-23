@@ -2,12 +2,13 @@ import { useEffect, useState, type FC } from "react";
 import DashboardLayout from "@/layout/DashboardLayout";
 import endpoints, { type XpHistoryRow } from "@/services/endpoints";
 import Pagination from "@/components/Pagination";
-import type { GamificationProfile } from "@/types";
+import type { GamificationProfile, Wallet } from "@/types";
 import {
   Sparkles,
   TrendingUp,
   Medal,
   Coins,
+  Gift,
   type LucideIcon,
 } from "lucide-react";
 
@@ -50,6 +51,7 @@ const TABS: { key: TabKey; label: string }[] = [
 
 const Profile: FC = () => {
   const [p, setP] = useState<GamificationProfile | null>(null);
+  const [wallet, setWallet] = useState<Wallet | null>(null);
   const [xp, setXp] = useState<XpHistoryRow[]>([]);
   const [xpPage, setXpPage] = useState(1);
   const [xpMeta, setXpMeta] = useState({ totalPages: 1, total: 0 });
@@ -64,6 +66,10 @@ const Profile: FC = () => {
       } finally {
         setLoading(false);
       }
+    })();
+    (async () => {
+      const wr = await endpoints.wallet.get();
+      if (wr?.success && wr.data) setWallet(wr.data);
     })();
   }, []);
 
@@ -197,6 +203,31 @@ const Profile: FC = () => {
                   {p.nextRank.rewardType.replace(/_/g, " ")}
                 </p>
               )}
+            </div>
+          )}
+
+          {/* Free spins from Reward Shop purchases */}
+          {(wallet?.freeSpins?.length ?? 0) > 0 && (
+            <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 mb-6">
+              <div className="flex items-center gap-2 text-slate-300 font-semibold mb-3">
+                <Gift size={16} className="text-fuchsia-400" />
+                Free Spins
+              </div>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                {wallet!.freeSpins.map((fs) => (
+                  <div
+                    key={fs.gameKey}
+                    className="rounded-lg border border-slate-800 bg-slate-950 p-3"
+                  >
+                    <div className="text-xs text-slate-400 capitalize">
+                      {fs.gameKey.replace(/-/g, " ")}
+                    </div>
+                    <div className="text-lg font-bold text-fuchsia-400">
+                      {fs.remaining}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 

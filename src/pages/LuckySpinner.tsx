@@ -32,6 +32,9 @@ const SEGMENTS: Segment[] = [
   { value: 500, color: "#eab308" },
 ];
 
+/** Minimum XP credited for any completed spin, win or lose. */
+const PARTICIPATION_XP = Math.min(...SEGMENTS.map((s) => s.value));
+
 const WEDGE = 360 / SEGMENTS.length; // 45°
 const SPIN_TURNS = 5; // full rotations on every spin for drama
 
@@ -132,6 +135,10 @@ const LuckySpinner: FC = () => {
     setSpinning(false);
 
     const winAmount = win ? picked.value : 0;
+    // The backend forwards `amount` to Gamru as the XP for this play, so a
+    // losing spin (winAmount 0) used to credit 0 XP. Participation always
+    // earns at least the smallest wedge value; a win earns the picked value.
+    const xpAmount = Math.max(winAmount, PARTICIPATION_XP);
     if (win) toast.success(`🎉 JACKPOT! Landed on ${landed.value}`);
     else toast.info(`Landed on ${landed.value} — you bet on ${picked.value}.`);
 
@@ -140,7 +147,7 @@ const LuckySpinner: FC = () => {
       const response = await endpoints.activity.record({
         type: "GAME_PLAY",
         gameId: randomGameId(),
-        amount: winAmount,
+        amount: xpAmount,
         idempotencyKey: newKey("GAME_PLAY"),
         meta: {
           game: "lucky-spinner",
